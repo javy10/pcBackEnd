@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\colaborador;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class colaboradorController extends Controller
 {
@@ -14,8 +15,18 @@ class colaboradorController extends Controller
      */
     public function index()
     {
-        $colaborador = colaborador::all();
-        return $colaborador;
+         $colaborador = DB::table('colaboradors')
+                 ->join('agencias', 'colaboradors.agencia_id', '=', 'agencias.id')
+                 ->join('detalle_departamento_cargos', 'colaboradors.detalle_departamento_cargo_id', '=', 'detalle_departamento_cargos.id')
+                 ->join('departamentos', 'detalle_departamento_cargos.departamento_id', '=', 'departamentos.id')
+                 ->join('cargos', 'detalle_departamento_cargos.cargo_id', '=', 'cargos.id')
+                 ->select('agencias.nombre AS agencia', 'departamentos.nombre AS departamento', 'cargos.nombre as cargo', 'colaboradors.nombres AS nombre', 'colaboradors.apellidos AS apellido')
+                 ->get();
+
+        return response()->json([
+            'dataDB' => $colaborador,
+            'success' => true
+        ]);
     }
 
     /**

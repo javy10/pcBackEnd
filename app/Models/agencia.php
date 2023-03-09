@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class agencia extends Model
 {
     use HasFactory;
+    
+    public function colaborador(){
+        return $this->hasMany(colaborador::class);
+    }
 }

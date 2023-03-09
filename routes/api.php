@@ -36,6 +36,6 @@ Route::controller(departamentoController::class)->group(function() {
 
 Route::controller(cargoController::class)->group(function() {
     Route::get('cargos','index')->name('cargos');
-    Route::post('cargos/{id}','show')->name('cargosId');
+    Route::get('cargos/{id}','show')->name('cargosId');
 });
 

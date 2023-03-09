@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class departamento extends Model
 {
+    use HasFactory;
+    
+    protected $fillable = [
+        'nombre',
+        'habilitado',
+    ];
+
     public function departamentoCargo()
     {
         return $this->belongsToMany(cargo::class);

@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\cargo;
-use App\Models\departamento;
+use App\Models\detalleDepartamentoCargo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class cargoController extends Controller
+class detalleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,8 +14,8 @@ class cargoController extends Controller
      */
     public function index()
     {
-        $cargos = cargo::all();
-        return $cargos;
+        $detalles = detalleDepartamentoCargo::all();
+        return $detalles;
     }
 
     /**
@@ -47,19 +45,9 @@ class cargoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
-    public function show(Request $depart)
+    public function show($id)
     {
-        $cargo = DB::table('detalle_departamento_cargos')
-                 ->join('departamentos', 'detalle_departamento_cargos.departamento_id', '=', 'departamentos.id')
-                 ->join('cargos', 'detalle_departamento_cargos.cargo_id', '=', 'cargos.id')
-                 ->where('detalle_departamento_cargos.departamento_id', $depart->id)
-                 ->get();
-                 
-        return response()->json([
-            'dataDB' => $cargo,
-            'success' => true
-        ]);
+        //
     }
 
     /**
