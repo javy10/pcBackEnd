@@ -7,5 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class cargo extends Model
 {
-    use HasFactory;
+    public function cargoDepartamento()
+    {
+        return $this->belongsToMany(departamento::class);
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\cargo;
+use App\Models\departamento;
 use App\Models\detalleDepartamentoCargo;
 use Illuminate\Http\Request;
 
@@ -46,9 +47,12 @@ class cargoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+
+    public function show(departamento $depart)
     {
-        //$cargosPorDept = detalleDepartamentoCargo::select('')
+        $depart = departamento::find($depart->id);
+        $depart->departamentoCargo;
+        return json_encode($depart);
     }
 
     /**
