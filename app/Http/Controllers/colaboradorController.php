@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\colaborador;
+use App\Models\detalleDepartamentoCargo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +18,7 @@ class colaboradorController extends Controller
     {
          $colaborador = DB::table('colaboradors')
                  ->join('agencias', 'colaboradors.agencia_id', '=', 'agencias.id')
-                 ->join('detalle_departamento_cargos', 'colaboradors.detalle_departamento_cargo_id', '=', 'detalle_departamento_cargos.id')
+                 ->join('detalle_departamento_cargos', 'colaboradors.detalle_departamento_cargo_id', '=','detalle_departamento_cargos.id')
                  ->join('departamentos', 'detalle_departamento_cargos.departamento_id', '=', 'departamentos.id')
                  ->join('cargos', 'detalle_departamento_cargos.cargo_id', '=', 'cargos.id')
                  ->select('agencias.nombre AS agencia', 'departamentos.nombre AS departamento', 'cargos.nombre as cargo', 'colaboradors.nombres AS nombre', 'colaboradors.apellidos AS apellido')
@@ -34,9 +35,50 @@ class colaboradorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function createColaborador(Request $request)
     {
-        //
+         // obtener los datos del usuario de la solicitud POST
+         $nombres = $request->input('nombres');
+         $correo = $request->input('correo');
+         $dui = $request->input('dui');
+         $clave = $request->input('clave');
+         $telefono = $request->input('telefono');
+         $correo = $request->input('correo');
+         $agencia_id = $request->input('agencia_id');
+         $departamento_id = $request->input('departamento');
+         $cargo_id = $request->input('cargo');
+
+        //insertando en la primera tabal
+        $detalle = new detalleDepartamentoCargo();
+        $detalle->departamento_id = $departamento_id;
+        $detalle->cargo_id = $cargo_id;
+        $detalle->habilitado = 'S';
+        $detalle->created_at = now();
+        $detalle->save();
+
+        //obtenemos el id del detalle insertado
+        // $detalle_id = $detalle->id;
+
+        //  // crear un nuevo usuario en la base de datos
+        //  $usuario = new colaborador();
+        //  $usuario->nombres = $nombres;
+        //  $usuario->correo = $correo;
+        //  $usuario->dui = $dui;
+        //  $usuario->clave = $clave;
+        //  $usuario->telefono = $telefono;
+        //  $usuario->correo = $correo;
+        //  $usuario->agencia_id = $agencia_id;
+        //  $usuario->detalle_departamento_cargo_id = $detalle_id;
+        //  $usuario->habilitado = 'S';
+        //  $usuario->created_at = now();
+
+        //  // guardar el usuario en la base de datos
+        //  $usuario->save();
+
+        //  // devolver una respuesta JSON con el nuevo usuario
+        //  return response()->json([
+        //      'usuario' => $usuario
+        //  ]);
     }
 
     /**
@@ -58,7 +100,7 @@ class colaboradorController extends Controller
      */
     public function show($id)
     {
-        
+
     }
 
     /**
