@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::controller(colaboradorController::class)->group(function() {
     Route::get('colaboradores','index')->name('colaborador');
-    Route::get('guardar','createColaborador')->name('createcolaborador');
+    Route::post('colaborador','createColaborador')->name('createcolaborador');
 });
 
 Route::controller(agenciaController::class)->group(function() {

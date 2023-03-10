@@ -62,6 +62,8 @@ class cargoController extends Controller
         ]);
     }
 
+    // seleccione los cargos donde el cargo_id = el que trae en el request.
+
     /**
      * Show the form for editing the specified resource.
      *

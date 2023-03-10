@@ -37,16 +37,22 @@ class colaboradorController extends Controller
      */
     public function createColaborador(Request $request)
     {
-         // obtener los datos del usuario de la solicitud POST
+
+        // return $request;
+        // die;
+        //  // obtener los datos del usuario de la solicitud POST
          $nombres = $request->input('nombres');
+         $apellidos = $request->input('apellidos');
          $correo = $request->input('correo');
          $dui = $request->input('dui');
          $clave = $request->input('clave');
          $telefono = $request->input('telefono');
          $correo = $request->input('correo');
-         $agencia_id = $request->input('agencia_id');
+         $agencia_id = $request->input('agencia');
          $departamento_id = $request->input('departamento');
          $cargo_id = $request->input('cargo');
+         $foto = $request->input('foto');
+         $intentos = $request->input('intentos');
 
         //insertando en la primera tabal
         $detalle = new detalleDepartamentoCargo();
@@ -57,28 +63,31 @@ class colaboradorController extends Controller
         $detalle->save();
 
         //obtenemos el id del detalle insertado
-        // $detalle_id = $detalle->id;
+        $detalle_id = $detalle->id;
 
-        //  // crear un nuevo usuario en la base de datos
-        //  $usuario = new colaborador();
-        //  $usuario->nombres = $nombres;
-        //  $usuario->correo = $correo;
-        //  $usuario->dui = $dui;
-        //  $usuario->clave = $clave;
-        //  $usuario->telefono = $telefono;
-        //  $usuario->correo = $correo;
-        //  $usuario->agencia_id = $agencia_id;
-        //  $usuario->detalle_departamento_cargo_id = $detalle_id;
-        //  $usuario->habilitado = 'S';
-        //  $usuario->created_at = now();
+         // crear un nuevo usuario en la base de datos
+         $usuario = new colaborador();
+         $usuario->nombres = $nombres;
+         $usuario->apellidos = $apellidos;
+         $usuario->correo = $correo;
+         $usuario->dui = $dui;
+         $usuario->clave = $clave;
+         $usuario->telefono = $telefono;
+         $usuario->correo = $correo;
+         $usuario->agencia_id = $agencia_id;
+         $usuario->detalle_departamento_cargo_id = $detalle_id;
+         $usuario->habilitado = 'S';
+         $usuario->foto = $foto;
+         $usuario->intentos = 5;
+         $usuario->created_at = now();
 
-        //  // guardar el usuario en la base de datos
-        //  $usuario->save();
+         // guardar el usuario en la base de datos
+         $usuario->save();
 
-        //  // devolver una respuesta JSON con el nuevo usuario
-        //  return response()->json([
-        //      'usuario' => $usuario
-        //  ]);
+         // devolver una respuesta JSON con el nuevo usuario
+         return response()->json([
+             'usuario' => $usuario
+         ]);
     }
 
     /**
