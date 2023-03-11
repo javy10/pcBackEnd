@@ -17,11 +17,11 @@ class colaboradorController extends Controller
     public function index()
     {
          $colaborador = DB::table('colaboradors')
-                 ->join('agencias', 'colaboradors.agencia_id', '=', 'agencias.id')
-                 ->join('departamentos', 'colaboradors.departamento_id', '=', 'departamentos.id')
-                 ->join('cargos', 'colaboradors.cargo_id', '=', 'cargos.id')
-                 ->select('agencias.nombre AS agencia', 'departamentos.nombre AS departamento', 'cargos.nombre as cargo', 'colaboradors.nombres AS nombre', 'colaboradors.apellidos AS apellido')
-                 ->get();
+                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'colaboradors.nombres AS nombre', 'colaboradors.apellidos AS apellido', 'colaboradors.telefono AS telefono', 'colaboradors.correo AS email', 'colaboradors.dui AS dui')
+                ->join('agencias', 'colaboradors.agencia_id', '=', 'agencias.id')
+                ->join('departamentos', 'colaboradors.departamento_id', '=', 'departamentos.id')
+                ->join('cargos', 'colaboradors.cargo_id', '=', 'cargos.id')
+                ->get();
 
         return response()->json([
             'dataDB' => $colaborador,
