@@ -15,9 +15,11 @@ return new class extends Migration
     {
         Schema::create('cargos', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('departamento_id');
             $table->string('nombre');
             $table->char('habilitado');
             $table->timestamps();
+            $table->foreign('departamento_id')->references('id')->on('departamentos')->onDelete('cascade');
         });
     }
 

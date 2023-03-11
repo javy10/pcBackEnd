@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('colaboradors', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('agencia_id');
-            $table->unsignedBigInteger('detalle_departamento_cargo_id');
+            $table->unsignedBigInteger('departamento_id');
+            $table->unsignedBigInteger('cargo_id');
             $table->string('nombres');
             $table->string('apellidos');
             $table->string('dui');
@@ -28,7 +29,8 @@ return new class extends Migration
             $table->char('habilitado');
             $table->timestamps();
             $table->foreign('agencia_id')->references('id')->on('agencias')->onDelete('cascade');
-            $table->foreign('detalle_departamento_cargo_id')->references('id')->on('detalle_departamento_cargos')->onDelete('cascade');
+            $table->foreign('departamento_id')->references('id')->on('departamentos')->onDelete('cascade');
+            $table->foreign('cargo_id')->references('id')->on('cargos')->onDelete('cascade');
         });
     }
 

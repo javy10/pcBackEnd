@@ -50,19 +50,17 @@ class cargoController extends Controller
 
     public function show(Request $depart)
     {
-        $cargo = DB::table('detalle_departamento_cargos')
-                 ->join('departamentos', 'detalle_departamento_cargos.departamento_id', '=', 'departamentos.id')
-                 ->join('cargos', 'detalle_departamento_cargos.cargo_id', '=', 'cargos.id')
-                 ->where('detalle_departamento_cargos.departamento_id', $depart->id)
-                 ->get();
-                 
+        $cargo = DB::table('cargos')
+                ->distinct()
+                ->select('cargos.id', 'cargos.nombre')
+                ->join('departamentos', 'cargos.departamento_id', '=', 'departamentos.id')
+                ->where('cargos.departamento_id', $depart->id)
+                ->get();
         return response()->json([
             'dataDB' => $cargo,
             'success' => true
         ]);
     }
-
-    // seleccione los cargos donde el cargo_id = el que trae en el request.
 
     /**
      * Show the form for editing the specified resource.

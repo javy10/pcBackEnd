@@ -18,9 +18,8 @@ class colaboradorController extends Controller
     {
          $colaborador = DB::table('colaboradors')
                  ->join('agencias', 'colaboradors.agencia_id', '=', 'agencias.id')
-                 ->join('detalle_departamento_cargos', 'colaboradors.detalle_departamento_cargo_id', '=','detalle_departamento_cargos.id')
-                 ->join('departamentos', 'detalle_departamento_cargos.departamento_id', '=', 'departamentos.id')
-                 ->join('cargos', 'detalle_departamento_cargos.cargo_id', '=', 'cargos.id')
+                 ->join('departamentos', 'colaboradors.departamento_id', '=', 'departamentos.id')
+                 ->join('cargos', 'colaboradors.cargo_id', '=', 'cargos.id')
                  ->select('agencias.nombre AS agencia', 'departamentos.nombre AS departamento', 'cargos.nombre as cargo', 'colaboradors.nombres AS nombre', 'colaboradors.apellidos AS apellido')
                  ->get();
 
@@ -40,7 +39,8 @@ class colaboradorController extends Controller
 
         // return $request;
         // die;
-        //  // obtener los datos del usuario de la solicitud POST
+
+        // obtener los datos del usuario de la solicitud POST
          $nombres = $request->input('nombres');
          $apellidos = $request->input('apellidos');
          $correo = $request->input('correo');
@@ -52,18 +52,6 @@ class colaboradorController extends Controller
          $departamento_id = $request->input('departamento');
          $cargo_id = $request->input('cargo');
          $foto = $request->input('foto');
-         $intentos = $request->input('intentos');
-
-        //insertando en la primera tabal
-        $detalle = new detalleDepartamentoCargo();
-        $detalle->departamento_id = $departamento_id;
-        $detalle->cargo_id = $cargo_id;
-        $detalle->habilitado = 'S';
-        $detalle->created_at = now();
-        $detalle->save();
-
-        //obtenemos el id del detalle insertado
-        $detalle_id = $detalle->id;
 
          // crear un nuevo usuario en la base de datos
          $usuario = new colaborador();
@@ -75,7 +63,8 @@ class colaboradorController extends Controller
          $usuario->telefono = $telefono;
          $usuario->correo = $correo;
          $usuario->agencia_id = $agencia_id;
-         $usuario->detalle_departamento_cargo_id = $detalle_id;
+         $usuario->departamento_id = $departamento_id;
+         $usuario->cargo_id = $cargo_id;
          $usuario->habilitado = 'S';
          $usuario->foto = $foto;
          $usuario->intentos = 5;
