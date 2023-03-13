@@ -62,6 +62,12 @@ class cargoController extends Controller
         ]);
     }
 
+    public function buscar(Request $request)
+    {
+        $colab = cargo::find($request->id);
+        return $colab;
+    }
+
     /**
      * Show the form for editing the specified resource.
      *

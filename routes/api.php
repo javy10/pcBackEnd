@@ -23,20 +23,26 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::controller(colaboradorController::class)->group(function() {
-    Route::get('colaboradores','index')->name('colaborador');
+    Route::get('colaboradores','index')->name('colaboradores');
     Route::post('colaborador','createColaborador')->name('createcolaborador');
+    Route::get('eliminarcolaborador/{id}','edit')->name('eliminarcolaborador');
+    Route::get('colaborador/{id}','show')->name('buscarcolaboradorId');
+    Route::put('editarcolaborador/{id}','update')->name('editarColaborador');
 });
 
 Route::controller(agenciaController::class)->group(function() {
     Route::get('agencias','index')->name('agencias');
+    Route::get('agencia/{id}','show')->name('buscaragenciaId');
 });
 
 Route::controller(departamentoController::class)->group(function() {
     Route::get('departamentos','index')->name('departamentos');
+    Route::get('departamento/{id}','show')->name('buscardepartamentoId');
 });
 
 Route::controller(cargoController::class)->group(function() {
     Route::get('cargos','index')->name('cargos');
     Route::get('cargos/{id}','show')->name('cargosId');
+    Route::get('cargo/{id}','buscar')->name('cargoId');
 });
 

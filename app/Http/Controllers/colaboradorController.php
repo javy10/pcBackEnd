@@ -17,10 +17,11 @@ class colaboradorController extends Controller
     public function index()
     {
          $colaborador = DB::table('colaboradors')
-                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'colaboradors.nombres AS nombre', 'colaboradors.apellidos AS apellido', 'colaboradors.telefono AS telefono', 'colaboradors.correo AS email', 'colaboradors.dui AS dui')
+                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'colaboradors.nombres AS nombres', 'colaboradors.apellidos AS apellidos', 'colaboradors.telefono AS telefono', 'colaboradors.correo AS correo', 'colaboradors.dui AS dui', 'colaboradors.id AS id')
                 ->join('agencias', 'colaboradors.agencia_id', '=', 'agencias.id')
                 ->join('departamentos', 'colaboradors.departamento_id', '=', 'departamentos.id')
                 ->join('cargos', 'colaboradors.cargo_id', '=', 'cargos.id')
+                ->where('colaboradors.habilitado', 'S')
                 ->get();
 
         return response()->json([
@@ -36,10 +37,6 @@ class colaboradorController extends Controller
      */
     public function createColaborador(Request $request)
     {
-
-        // return $request;
-        // die;
-
         // obtener los datos del usuario de la solicitud POST
          $nombres = $request->input('nombres');
          $apellidos = $request->input('apellidos');
@@ -96,9 +93,10 @@ class colaboradorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-
+        $colab = colaborador::find($request->id);
+        return $colab;
     }
 
     /**
@@ -107,9 +105,15 @@ class colaboradorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $colab)
     {
-        //
+        $colaborador = colaborador::findOrFail($colab->id)->update([
+            'habilitado' => 'N'
+        ]);
+        return response()->json([
+            'dataDB' => $colaborador,
+            'success' => true
+        ]);
     }
 
     /**
