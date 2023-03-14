@@ -9,18 +9,28 @@ class colaborador extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'habilitado'
+        'habilitado',
+        'nombres',
+        'apellidos',
+        'dui',
+        'telefono',
+        'clave',
+        'correo',
+        'agencia_id',
+        'departamento_id',
+        'cargo_id',
+        'foto'
     ];
 
     public function agencia(){ //$colaborador->agencia->nombre
         return $this->belongsTo(agencia::class); //Pertenece a una agencia.
     }
 
-    public function departamento(){ 
-        return $this->belongsTo(departamento::class); 
+    public function departamento(){
+        return $this->belongsTo(departamento::class);
     }
 
-    public function cargo(){ 
-        return $this->belongsTo(cargo::class); 
+    public function cargo(){
+        return $this->belongsTo(cargo::class);
     }
 }

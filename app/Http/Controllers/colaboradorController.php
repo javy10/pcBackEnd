@@ -125,7 +125,21 @@ class colaboradorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $registro = colaborador::findOrFail($id);
+        $registro->foto = $request->foto;
+        $registro->dui = $request->dui;
+        $registro->nombres = $request->nombres;
+        $registro->apellidos = $request->apellidos;
+        $registro->agencia_id = $request->agencia;
+        $registro->departamento_id = $request->departamento;
+        $registro->cargo_id = $request->cargo;
+        $registro->telefono = $request->telefono;
+        $registro->correo = $request->correo;
+        $registro->save();
+        return response()->json([
+            'dataDB' => $registro,
+            'success' => true
+        ]);
     }
 
     /**
