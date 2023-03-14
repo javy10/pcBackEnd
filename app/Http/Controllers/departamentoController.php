@@ -48,7 +48,10 @@ class departamentoController extends Controller
     public function show(Request $request)
     {
         $colab = departamento::find($request->id);
-        return $colab;
+        return response()->json([
+            'dataDB' => $colab,
+            'success' => true
+        ]);
     }
 
     /**

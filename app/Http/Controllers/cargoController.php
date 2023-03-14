@@ -65,7 +65,10 @@ class cargoController extends Controller
     public function buscar(Request $request)
     {
         $colab = cargo::find($request->id);
-        return $colab;
+        return response()->json([
+            'dataDB' => $colab,
+            'success' => true
+        ]);
     }
 
     /**

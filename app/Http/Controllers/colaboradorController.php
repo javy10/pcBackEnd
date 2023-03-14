@@ -96,7 +96,10 @@ class colaboradorController extends Controller
     public function show(Request $request)
     {
         $colab = colaborador::find($request->id);
-        return $colab;
+        return response()->json([
+            'dataDB' => $colab,
+            'success' => true
+        ]);
     }
 
     /**

@@ -48,7 +48,10 @@ class agenciaController extends Controller
     public function show(Request $request)
     {
         $colab = agencia::find($request->id);
-        return json_decode($colab);
+        return response()->json([
+            'dataDB' => $colab,
+            'success' => true
+        ]);
     }
 
     /**
