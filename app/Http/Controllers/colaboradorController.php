@@ -17,7 +17,7 @@ class colaboradorController extends Controller
     public function index()
     {
          $colaborador = DB::table('colaboradors')
-                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'colaboradors.nombres AS nombres', 'colaboradors.apellidos AS apellidos', 'colaboradors.telefono AS telefono', 'colaboradors.correo AS correo', 'colaboradors.dui AS dui', 'colaboradors.id AS id')
+                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'colaboradors.nombres AS nombres', 'colaboradors.apellidos AS apellidos', 'colaboradors.telefono AS telefono', 'colaboradors.correo AS correo', 'colaboradors.dui AS dui', 'colaboradors.id AS id', 'colaboradors.foto AS foto')
                 ->join('agencias', 'colaboradors.agencia_id', '=', 'agencias.id')
                 ->join('departamentos', 'colaboradors.departamento_id', '=', 'departamentos.id')
                 ->join('cargos', 'colaboradors.cargo_id', '=', 'cargos.id')
@@ -51,10 +51,13 @@ class colaboradorController extends Controller
          $agencia_id = $request->input('agencia');
          $departamento_id = $request->input('departamento');
          $cargo_id = $request->input('cargo');
-         $foto = $request->input('foto');
+         //$foto = $request->input('foto');
 
-         $ruta = $request->file('foto')->store('public/imagenes');
-         $url = Storage::url($ruta);
+         $img = $request->file('foto');
+         $nombreImg = $img->getClientOriginalName();
+         //$img->store('public/imagenes');
+         //$url = Storage::url($ruta);
+         
          // crear un nuevo usuario en la base de datos
          $usuario = new colaborador();
          $usuario->nombres = $nombres;
@@ -68,7 +71,7 @@ class colaboradorController extends Controller
          $usuario->departamento_id = $departamento_id;
          $usuario->cargo_id = $cargo_id;
          $usuario->habilitado = 'S';
-         $usuario->foto = $url;
+         $usuario->foto = $nombreImg;
          $usuario->intentos = 5;
          $usuario->created_at = now();
 
@@ -108,6 +111,18 @@ class colaboradorController extends Controller
         ]);
     }
 
+    public function buscar(Request $request)
+    {
+        $colab = DB::table('colaboradors')
+                ->select('colaboradors.clave AS clave', 'colaboradors.intentos AS intentos')
+                ->where('colaboradors.dui', $request->dui)
+                ->get();
+        return response()->json([
+            'dataDB' => $colab,
+            'success' => true
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -124,6 +139,30 @@ class colaboradorController extends Controller
             'success' => true
         ]);
     }
+
+    public function editarIntentos(Request $request)
+    {
+        // return $request->dui;
+        // die;
+
+        // $colaborador = colaborador::findOrFail($request->dui)->update([
+        //     'intentos' => 0
+        // ]);
+        // return response()->json([
+        //     'dataDB' => $colaborador,
+        //     'success' => true
+        // ]);
+
+        $colab = DB::table('colaboradors')
+                ->where('colaboradors.dui', $request->dui)
+                ->update(['intentos' => 0]);
+                
+        return response()->json([
+            'dataDB' => $colab,
+            'success' => true
+        ]);
+    }
+
 
     /**
      * Update the specified resource in storage.

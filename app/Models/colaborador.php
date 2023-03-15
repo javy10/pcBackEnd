@@ -19,7 +19,8 @@ class colaborador extends Model
         'agencia_id',
         'departamento_id',
         'cargo_id',
-        'foto'
+        'foto',
+        'intentos'
     ];
 
     public function agencia(){ //$colaborador->agencia->nombre
