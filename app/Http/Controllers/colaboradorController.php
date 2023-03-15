@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\colaborador;
-use App\Models\detalleDepartamentoCargo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class colaboradorController extends Controller
 {
@@ -37,6 +37,9 @@ class colaboradorController extends Controller
      */
     public function createColaborador(Request $request)
     {
+
+        // return $request;
+        // die;
         // obtener los datos del usuario de la solicitud POST
          $nombres = $request->input('nombres');
          $apellidos = $request->input('apellidos');
@@ -50,6 +53,8 @@ class colaboradorController extends Controller
          $cargo_id = $request->input('cargo');
          $foto = $request->input('foto');
 
+         $ruta = $request->file('foto')->store('public/imagenes');
+         $url = Storage::url($ruta);
          // crear un nuevo usuario en la base de datos
          $usuario = new colaborador();
          $usuario->nombres = $nombres;
@@ -63,7 +68,7 @@ class colaboradorController extends Controller
          $usuario->departamento_id = $departamento_id;
          $usuario->cargo_id = $cargo_id;
          $usuario->habilitado = 'S';
-         $usuario->foto = $foto;
+         $usuario->foto = $url;
          $usuario->intentos = 5;
          $usuario->created_at = now();
 
@@ -72,7 +77,8 @@ class colaboradorController extends Controller
 
          // devolver una respuesta JSON con el nuevo usuario
          return response()->json([
-             'usuario' => $usuario
+             'usuario' => $usuario,
+             'success' => true
          ]);
     }
 
