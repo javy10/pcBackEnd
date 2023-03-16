@@ -26,6 +26,7 @@ Route::controller(colaboradorController::class)->group(function() {
     Route::get('colaboradores','index')->name('colaboradores');
     Route::post('colaborador','createColaborador')->name('createcolaborador');
     Route::get('eliminarcolaborador/{id}','edit')->name('eliminarcolaborador');
+    Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
     Route::get('colaborador/{id}','show')->name('buscarcolaboradorId');
     Route::put('editarcolaborador/{id}','update')->name('editarColaborador');
     Route::get('login/{dui}','buscar')->name('buscarColaboradorDui');
