@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\agenciaController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\cargoController;
 use App\Http\Controllers\colaboradorController;
 use App\Http\Controllers\departamentoController;
@@ -21,6 +22,14 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//Route::post('register', AuthController::class, 'register');
+Route::controller(AuthController::class)->group(function() {
+    Route::post('register','register')->name('register');
+    //Route::post('createColaborador','createColaborador')->name('createColaborador');
+    //Route::get('agencia/{id}','show')->name('buscaragenciaId');
+});
+
 
 Route::controller(colaboradorController::class)->group(function() {
     Route::get('colaboradores','index')->name('colaboradores');

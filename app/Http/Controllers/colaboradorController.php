@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\colaborador;
+
+use App\Models\Colaborador as Colaborador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
 
 class colaboradorController extends Controller
 {
@@ -41,48 +44,66 @@ class colaboradorController extends Controller
         // return $request;
         // die;
         // obtener los datos del usuario de la solicitud POST
-         $nombres = $request->input('nombres');
-         $apellidos = $request->input('apellidos');
-         $correo = $request->input('correo');
-         $dui = $request->input('dui');
-         $clave = $request->input('clave');
-         $telefono = $request->input('telefono');
-         $correo = $request->input('correo');
-         $agencia_id = $request->input('agencia');
-         $departamento_id = $request->input('departamento');
-         $cargo_id = $request->input('cargo');
+        //  $nombres = $request->input('nombres');
+        //  $apellidos = $request->input('apellidos');
+        //  $correo = $request->input('correo');
+        //  $dui = $request->input('dui');
+        //  $clave = $request->input('clave');
+        //  $telefono = $request->input('telefono');
+        //  $correo = $request->input('correo');
+        //  $agencia_id = $request->input('agencia');
+        //  $departamento_id = $request->input('departamento');
+        //  $cargo_id = $request->input('cargo');
          //$foto = $request->input('foto');
 
-         $img = $request->file('foto');
-         $nombreImg = $img->getClientOriginalName();
+        //  $img = $request->file('foto');
+        //  $nombreImg = $img->getClientOriginalName();
          //$img->store('public/imagenes');
          //$url = Storage::url($ruta);
 
          // crear un nuevo usuario en la base de datos
-         $usuario = new colaborador();
-         $usuario->nombres = $nombres;
-         $usuario->apellidos = $apellidos;
-         $usuario->correo = $correo;
-         $usuario->dui = $dui;
-         $usuario->clave = $clave;
-         $usuario->telefono = $telefono;
-         $usuario->correo = $correo;
-         $usuario->agencia_id = $agencia_id;
-         $usuario->departamento_id = $departamento_id;
-         $usuario->cargo_id = $cargo_id;
-         $usuario->habilitado = 'S';
-         $usuario->foto = $nombreImg;
-         $usuario->intentos = 5;
-         $usuario->created_at = now();
-
+        //  $usuario = new colaborador();
+        //  $usuario->nombres = $nombres;
+        //  $usuario->apellidos = $apellidos;
+        //  $usuario->correo = $correo;
+        //  $usuario->dui = $dui;
+        //  $usuario->clave = $clave;
+        //  $usuario->telefono = $telefono;
+        //  $usuario->correo = $correo;
+        //  $usuario->agencia_id = $agencia_id;
+        //  $usuario->departamento_id = $departamento_id;
+        //  $usuario->cargo_id = $cargo_id;
+        //  $usuario->habilitado = 'S';
+         //$usuario->foto = $nombreImg;
+        //  $usuario->intentos = 5;
+        //  $usuario->created_at = now();
          // guardar el usuario en la base de datos
-         $usuario->save();
+         //$usuario->save();
+         
+         $user = Colaborador::create([
+            'nombres' => $request->nombres,
+            'apellidos' => $request->apellidos,
+            'correo' => $request->correo,
+            'clave' => $request->clave,
+            'agencia_id' => $request->agencia_id,
+            'departamento_id' => $request->departamento_id,
+            'cargo_id' => $request->cargo_id,
+            'dui' => $request->dui,
+            'telefono' => $request->telefono,
+            'intentos' => $request->intentos,
+            'habilitado' => $request->habilitado,
+            'foto' => $request->foto,
+            
+        ]);
 
-         // devolver una respuesta JSON con el nuevo usuario
+        $token = JWTAuth::fromUser($user);
+
+         // devolver una respuesta JSON con el nuevo user
          return response()->json([
-             'usuario' => $usuario,
+             'user' => $user,
+             'token' => $token,
              'success' => true
-         ]);
+         ], 201);
     }
 
     /**

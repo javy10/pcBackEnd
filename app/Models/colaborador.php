@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class colaborador extends Model
+class Colaborador extends Authenticatable implements JWTSubject
 {
     use HasFactory;
     protected $fillable = [
@@ -20,7 +22,7 @@ class colaborador extends Model
         'departamento_id',
         'cargo_id',
         'foto',
-        'intentos'
+         'intentos'
     ];
 
     public function agencia(){ //$colaborador->agencia->nombre
@@ -33,5 +35,12 @@ class colaborador extends Model
 
     public function cargo(){
         return $this->belongsTo(cargo::class);
+    }
+
+    public function getJWTIdentifier(){
+        return $this->getKey();
+    }
+    public function getJWTCustomClaims(){
+        return [];
     }
 }
