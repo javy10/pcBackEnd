@@ -6,21 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    
+    public function up()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->unsignedBigInteger('agencia_id');
+            $table->unsignedBigInteger('departamento_id');
+            $table->unsignedBigInteger('cargo_id');
+            $table->string('nombres');
+            $table->string('apellidos');
+            $table->string('dui')->unique();
             $table->string('password');
-            $table->rememberToken();
-            $table->foreignId('current_team_id')->nullable();
-            $table->string('profile_photo_path', 2048)->nullable();
+            $table->string('telefono');
+            $table->string('correo')->unique();
+            $table->string('foto')->nullable();
+            $table->integer('intentos');
+            $table->char('habilitado');
             $table->timestamps();
+            $table->foreign('agencia_id')->references('id')->on('agencias')->onDelete('cascade');
+            $table->foreign('departamento_id')->references('id')->on('departamentos')->onDelete('cascade');
+            $table->foreign('cargo_id')->references('id')->on('cargos')->onDelete('cascade');
         });
     }
 

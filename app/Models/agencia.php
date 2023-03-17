@@ -9,7 +9,7 @@ class agencia extends Model
 {
     use HasFactory;
     
-    public function colaborador(){
-        return $this->hasMany(colaborador::class);
+    public function User(){
+        return $this->hasMany(User::class);
     }
 }

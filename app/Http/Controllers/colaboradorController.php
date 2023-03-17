@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\AuthRequest;
-use App\Models\Colaborador as Colaborador;
+use App\Models\User as User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 class colaboradorController extends Controller
@@ -20,12 +21,12 @@ class colaboradorController extends Controller
      */
     public function index()
     {
-         $colaborador = DB::table('colaboradors')
-                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'colaboradors.nombres AS nombres', 'colaboradors.apellidos AS apellidos', 'colaboradors.telefono AS telefono', 'colaboradors.correo AS correo', 'colaboradors.dui AS dui', 'colaboradors.id AS id', 'colaboradors.foto AS foto', 'colaboradors.intentos AS intentos')
-                ->join('agencias', 'colaboradors.agencia_id', '=', 'agencias.id')
-                ->join('departamentos', 'colaboradors.departamento_id', '=', 'departamentos.id')
-                ->join('cargos', 'colaboradors.cargo_id', '=', 'cargos.id')
-                ->where('colaboradors.habilitado', 'S')
+         $colaborador = DB::table('users')
+                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.correo AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos')
+                ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+                ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+                ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+                ->where('users.habilitado', 'S')
                 ->get();
 
         return response()->json([
@@ -81,11 +82,11 @@ class colaboradorController extends Controller
          // guardar el usuario en la base de datos
          //$usuario->save();
 
-         $user = Colaborador::create([
+         $user = User::create([
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
             'correo' => $request->correo,
-            'clave' => $request->clave,
+            'password' => Hash::make($request->password),
             'agencia_id' => $request->agencia_id,
             'departamento_id' => $request->departamento_id,
             'cargo_id' => $request->cargo_id,
@@ -106,11 +107,11 @@ class colaboradorController extends Controller
          ], 201);
     }
 
-    public function singIn(Colaborador $request) {
-        $credenciales = $request->only('dui','clave');
+    public function singIn(AuthRequest $request) {
+        $credentials = $request->only('dui','password');
 
         try {
-            if(!$token = JWTAuth::attempt($credenciales)){
+            if(!$token = JWTAuth::attempt($credentials)){
                 return response()->json([
                     'error' => 'Credenciales invalidas'
                 ], 400);
@@ -142,7 +143,7 @@ class colaboradorController extends Controller
      */
     public function show(Request $request)
     {
-        $colab = colaborador::find($request->id);
+        $colab = User::find($request->id);
         return response()->json([
             'dataDB' => $colab,
             'success' => true
@@ -151,9 +152,9 @@ class colaboradorController extends Controller
 
     public function buscar(Request $request)
     {
-        $colab = DB::table('colaboradors')
-                ->select('colaboradors.clave AS clave', 'colaboradors.intentos AS intentos')
-                ->where('colaboradors.dui', $request->dui)
+        $colab = DB::table('users')
+                ->select('users.password AS clave', 'users.intentos AS intentos')
+                ->where('users.dui', $request->dui)
                 ->get();
         return response()->json([
             'dataDB' => $colab,
@@ -169,7 +170,7 @@ class colaboradorController extends Controller
      */
     public function edit(Request $colab)
     {
-        $colaborador = colaborador::findOrFail($colab->id)->update([
+        $colaborador = User::findOrFail($colab->id)->update([
             'habilitado' => 'N'
         ]);
         return response()->json([
@@ -180,7 +181,7 @@ class colaboradorController extends Controller
 
     public function desbloquear(Request $colab)
     {
-        $colaborador = colaborador::findOrFail($colab->id)->update([
+        $colaborador = User::findOrFail($colab->id)->update([
             'intentos' => 4
         ]);
         return response()->json([
@@ -202,9 +203,31 @@ class colaboradorController extends Controller
         //     'success' => true
         // ]);
 
-        $colab = DB::table('colaboradors')
-                ->where('colaboradors.dui', $request->dui)
+        $colab = DB::table('users')
+                ->where('users.dui', $request->dui)
                 ->update(['intentos' => 0]);
+
+        return response()->json([
+            'dataDB' => $colab,
+            'success' => true
+        ]);
+    }
+    public function editarIntentosEquivocados(Request $request)
+    {
+        // return $request->dui;
+        // die;
+
+        // $user = User::findOrFail($request->dui)->decrement('intentos',1);
+        
+        // return response()->json([
+        //     'dataDB' => $user,
+        //     'success' => true
+        // ]);
+
+        $colab = DB::table('users')
+                ->where('users.dui', $request->dui)
+                ->decrement('intentos',1);
+                //->update(['intentos' => 0]);
 
         return response()->json([
             'dataDB' => $colab,
@@ -222,7 +245,7 @@ class colaboradorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $registro = colaborador::findOrFail($id);
+        $registro = User::findOrFail($id);
         $registro->foto = $request->foto;
         $registro->dui = $request->dui;
         $registro->nombres = $request->nombres;

@@ -26,8 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //Route::post('register', AuthController::class, 'register');
 Route::controller(AuthController::class)->group(function() {
     Route::post('register','register')->name('register');
-    //Route::post('createColaborador','createColaborador')->name('createColaborador');
-    //Route::get('agencia/{id}','show')->name('buscaragenciaId');
+    Route::post('login','login')->name('login');
+    Route::get('user','user')->name('user');
+    Route::post('logout','logout')->name('logout');
 });
 
 
@@ -40,7 +41,8 @@ Route::controller(colaboradorController::class)->group(function() {
     Route::put('editarcolaborador/{id}','update')->name('editarColaborador');
     Route::get('login/{dui}','buscar')->name('buscarColaboradorDui');
     Route::get('editarintentos/{dui}','editarIntentos')->name('editarintentos');
-    Route::post('login','singIn')->name('login');
+    Route::get('editarIntentosEquivocados/{dui}','editarIntentosEquivocados')->name('editarintentos');
+    //Route::post('login','singIn')->name('login');
 });
 
 Route::controller(agenciaController::class)->group(function() {

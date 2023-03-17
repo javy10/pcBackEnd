@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -19,56 +18,22 @@ class User extends Authenticatable implements JWTSubject
     use Notifiable;
     use TwoFactorAuthenticatable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        // 'name',
-        // 'email',
-        // 'password',
-
+        'habilitado',
         'nombres',
-        'correo',
-        'clave',
-        // 'telefono',
-        // 'apellidos',
-        // 'dui',
-        // 'habilitado',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
+        'apellidos',
+        'dui',
+        'telefono',
         'password',
-        'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
+        'correo',
+        'agencia_id',
+        'departamento_id',
+        'cargo_id',
+        'foto',
+        'intentos'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
-    protected $appends = [
-        'profile_photo_url',
-    ];
-
-    public function agencia(){ //$colaborador->agencia->nombre
+    public function agencia(){ //$user->agencia->nombre
         return $this->belongsTo(agencia::class); //Pertenece a una agencia.
     }
 
