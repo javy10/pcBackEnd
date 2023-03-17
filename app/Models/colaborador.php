@@ -22,7 +22,7 @@ class Colaborador extends Authenticatable implements JWTSubject
         'departamento_id',
         'cargo_id',
         'foto',
-         'intentos'
+        'intentos'
     ];
 
     public function agencia(){ //$colaborador->agencia->nombre

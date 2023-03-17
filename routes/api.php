@@ -40,6 +40,7 @@ Route::controller(colaboradorController::class)->group(function() {
     Route::put('editarcolaborador/{id}','update')->name('editarColaborador');
     Route::get('login/{dui}','buscar')->name('buscarColaboradorDui');
     Route::get('editarintentos/{dui}','editarIntentos')->name('editarintentos');
+    Route::post('login','singIn')->name('login');
 });
 
 Route::controller(agenciaController::class)->group(function() {

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Http\Requests\Auth\AuthRequest;
 use App\Models\Colaborador as Colaborador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class colaboradorController extends Controller
 {
@@ -79,7 +80,7 @@ class colaboradorController extends Controller
         //  $usuario->created_at = now();
          // guardar el usuario en la base de datos
          //$usuario->save();
-         
+
          $user = Colaborador::create([
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
@@ -93,9 +94,8 @@ class colaboradorController extends Controller
             'intentos' => $request->intentos,
             'habilitado' => $request->habilitado,
             'foto' => $request->foto,
-            
-        ]);
 
+        ]);
         $token = JWTAuth::fromUser($user);
 
          // devolver una respuesta JSON con el nuevo user
@@ -104,6 +104,23 @@ class colaboradorController extends Controller
              'token' => $token,
              'success' => true
          ], 201);
+    }
+
+    public function singIn(Colaborador $request) {
+        $credenciales = $request->only('dui','clave');
+
+        try {
+            if(!$token = JWTAuth::attempt($credenciales)){
+                return response()->json([
+                    'error' => 'Credenciales invalidas'
+                ], 400);
+            }
+        } catch (JWTException $e) {
+            return response()->json([
+                'error' => 'Token no creado'
+            ], 500);
+        }
+        return response()->json([compact('token')]);
     }
 
     /**
