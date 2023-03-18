@@ -153,7 +153,7 @@ class colaboradorController extends Controller
     public function buscar(Request $request)
     {
         $colab = DB::table('users')
-                ->select('users.password AS clave', 'users.intentos AS intentos')
+                ->select('users.password AS clave', 'users.intentos AS intentos', 'users.id AS id')
                 ->where('users.dui', $request->dui)
                 ->get();
         return response()->json([
@@ -182,7 +182,7 @@ class colaboradorController extends Controller
     public function desbloquear(Request $colab)
     {
         $colaborador = User::findOrFail($colab->id)->update([
-            'intentos' => 4
+            'intentos' => 5
         ]);
         return response()->json([
             'dataDB' => $colaborador,
