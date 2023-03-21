@@ -7,6 +7,7 @@ use App\Http\Controllers\colaboradorController;
 use App\Http\Controllers\departamentoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +30,14 @@ Route::controller(AuthController::class)->group(function() {
     Route::post('login','login')->name('login');
     Route::get('user','user')->name('user');
     Route::post('logout','logout')->name('logout');
+    //Route::post('reestablecer','sendResetLinkEmail')->name('sendResetLinkEmail');
 });
+//Route::post('reset-password', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('password/email','Auth\ForgotPasswordController@sendResetLinkEmail');
+$router->post('password/reset', 'ResetPasswordController@reset');
+
+// Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+// Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 
 Route::controller(colaboradorController::class)->group(function() {

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -80,6 +81,20 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Se desconectó con éxito'
         ]); //
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+        return $request;
+        die;
+
+        $request->validate(['correo' => 'required|email']);
+
+        $response = Password::sendResetLink($request->only('correo'));
+
+        return $response === Password::RESET_LINK_SENT
+            ? response()->json(['message' => 'Mensaje enviado'], 200)
+            : response()->json(['message' => 'Falló el envio del mensaje'], 500);
     }
 
 
