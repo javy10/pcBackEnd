@@ -60,8 +60,8 @@ class colaboradorController extends Controller
 
         //  $img = $request->file('foto');
         //  $nombreImg = $img->getClientOriginalName();
-         //$img->store('public/imagenes');
-         //$url = Storage::url($ruta);
+        //  $img->store('public/imagenes');
+        //  $url = Storage::url($ruta);
 
          // crear un nuevo usuario en la base de datos
         //  $usuario = new colaborador();
@@ -76,7 +76,7 @@ class colaboradorController extends Controller
         //  $usuario->departamento_id = $departamento_id;
         //  $usuario->cargo_id = $cargo_id;
         //  $usuario->habilitado = 'S';
-         //$usuario->foto = $nombreImg;
+        //$usuario->foto = $nombreImg;
         //  $usuario->intentos = 5;
         //  $usuario->created_at = now();
          // guardar el usuario en la base de datos
@@ -245,19 +245,22 @@ class colaboradorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $registro = User::findOrFail($id);
-        $registro->foto = $request->foto;
-        $registro->dui = $request->dui;
-        $registro->nombres = $request->nombres;
-        $registro->apellidos = $request->apellidos;
-        $registro->agencia_id = $request->agencia;
-        $registro->departamento_id = $request->departamento;
-        $registro->cargo_id = $request->cargo;
-        $registro->telefono = $request->telefono;
-        $registro->correo = $request->correo;
-        $registro->save();
+        
+        $user = User::find($id);
+        $user->update([
+            'foto' => $request->foto,
+            'dui' => $request->dui,
+            'nombres' => $request->nombres,
+            'apellidos' => $request->apellidos,
+            'agencia_id' => $request->agencia,
+            'departamento_id' => $request->departamento,
+            'cargo_id' => $request->cargo,
+            'telefono' => $request->telefono,
+            'correo' => $request->correo,
+        ]);
+
         return response()->json([
-            'dataDB' => $registro,
+            'dataDB' => $user,
             'success' => true
         ]);
     }

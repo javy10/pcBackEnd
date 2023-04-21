@@ -8,6 +8,11 @@ use App\Http\Controllers\departamentoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth;
+use App\Http\Controllers\DocumentoController;
+use App\Http\Controllers\TipoDocumentoController;
+use App\Http\Controllers\DetalleArchivoDocumentoController;
+use App\Http\Controllers\DetallePermisoController;
+use App\Models\DetallePermiso;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,3 +77,23 @@ Route::controller(cargoController::class)->group(function() {
     Route::get('cargo/{id}','buscar')->name('cargoId');
 });
 
+Route::controller(TipoDocumentoController::class)->group(function() {
+    Route::get('tipoDocumentos','index')->name('tipoDocumentos');
+    Route::get('tipoDocumentos/{id}','show')->name('buscartipoDocumentosId');
+});
+
+Route::controller(DocumentoController::class)->group(function() {
+    Route::post('documentos', 'create')->name('documentos');
+    Route::get('listaDocumentos', 'show')->name('documentos');
+    Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
+    Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
+    Route::get('documentos/{nombre}', 'index')->name('documentos');
+});
+
+Route::controller(DetalleArchivoDocumentoController::class)->group(function() {
+    Route::get('documentos', 'show')->name('documentos');
+});
+
+Route::controller(DetallePermisoController::class)->group(function() {
+    Route::get('permisos', 'index')->name('permisos');
+});
