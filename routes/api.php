@@ -54,10 +54,12 @@ Route::controller(colaboradorController::class)->group(function() {
     Route::get('eliminarcolaborador/{id}','edit')->name('eliminarcolaborador');
     Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
     Route::get('colaborador/{id}','show')->name('buscarcolaboradorId');
-    Route::put('editarcolaborador/{id}','update')->name('editarColaborador');
+    Route::post('editarcolaborador','update')->name('editarColaborador');
     Route::get('login/{dui}','buscar')->name('buscarColaboradorDui');
     Route::get('editarintentos/{dui}','editarIntentos')->name('editarintentos');
     Route::get('editarIntentosEquivocados/{dui}','editarIntentosEquivocados')->name('editarintentos');
+    Route::post('editPassword','editPassword')->name('editPassword');
+    Route::get('fotoURL/{nombre}', 'obtenerFoto')->name('fotoUrl');
     //Route::post('login','singIn')->name('login');
 });
 
@@ -88,6 +90,7 @@ Route::controller(DocumentoController::class)->group(function() {
     Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
     Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
     Route::get('documentos/{nombre}', 'index')->name('documentos');
+  
 });
 
 Route::controller(DetalleArchivoDocumentoController::class)->group(function() {

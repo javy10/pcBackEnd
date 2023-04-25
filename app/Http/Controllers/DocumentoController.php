@@ -20,7 +20,6 @@ class DocumentoController extends Controller
     public function index(Request $request)
     {
         
-     
         $file = public_path('storage\\pdf\\'.$request->nombre);
         $headers = array('Content-Type: application/pdf');
         return response()->file($file, $headers);
@@ -42,12 +41,11 @@ class DocumentoController extends Controller
         $arr1 = json_decode(( $request->tipoPermiso_id ));
         $arr2 = json_decode(( $request->departamento_id ));
         $arr3 = json_decode(( $request->colaborador_id ));
-        $detalle = json_decode(( $request->detalleDoc ));
+        // $detalle = json_decode(( $request->detalleDoc ));
 
         $file = $request->file('url');
         $fileName = $file->getClientOriginalName();
         $filePath = public_path($fileName);
-
         $path = $file->storeAs('public/pdf', $fileName);
 
         //echo $path;

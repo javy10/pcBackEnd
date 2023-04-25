@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -17,6 +18,13 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+
+        $file = $request->file('foto');
+        $fileName = $file->getClientOriginalName();
+        //echo $fileName;
+        $filePath = public_path($fileName);
+        $path = $file->storeAs('public/imagenes', $fileName);
+
         $user = User::create([
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
@@ -29,14 +37,15 @@ class AuthController extends Controller
             'telefono' => $request->telefono,
             'intentos' => $request->intentos,
             'habilitado' => $request->habilitado,
-            'foto' => $request->foto,
+            'foto' => $fileName,
 
         ]);
-        //$token = JWTAuth::fromUser($user);
-         // devolver una respuesta JSON con el nuevo user
+        $token = JWTAuth::fromUser($user);
+         
          return response()->json([
             'message' => 'Registrado con exito',
             'user' => $user,
+            'token' => $token,
             'success' => true
          ], 201);
     }

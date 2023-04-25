@@ -11,6 +11,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\File;
 
 class colaboradorController extends Controller
 {
@@ -43,44 +44,14 @@ class colaboradorController extends Controller
     public function createColaborador(Request $request)
     {
 
-        // return $request;
-        // die;
-        // obtener los datos del usuario de la solicitud POST
-        //  $nombres = $request->input('nombres');
-        //  $apellidos = $request->input('apellidos');
-        //  $correo = $request->input('correo');
-        //  $dui = $request->input('dui');
-        //  $clave = $request->input('clave');
-        //  $telefono = $request->input('telefono');
-        //  $correo = $request->input('correo');
-        //  $agencia_id = $request->input('agencia');
-        //  $departamento_id = $request->input('departamento');
-        //  $cargo_id = $request->input('cargo');
-         //$foto = $request->input('foto');
+        // echo $request->foto;
+        // echo gettype($request->foto);
 
-        //  $img = $request->file('foto');
-        //  $nombreImg = $img->getClientOriginalName();
-        //  $img->store('public/imagenes');
-        //  $url = Storage::url($ruta);
 
-         // crear un nuevo usuario en la base de datos
-        //  $usuario = new colaborador();
-        //  $usuario->nombres = $nombres;
-        //  $usuario->apellidos = $apellidos;
-        //  $usuario->correo = $correo;
-        //  $usuario->dui = $dui;
-        //  $usuario->clave = $clave;
-        //  $usuario->telefono = $telefono;
-        //  $usuario->correo = $correo;
-        //  $usuario->agencia_id = $agencia_id;
-        //  $usuario->departamento_id = $departamento_id;
-        //  $usuario->cargo_id = $cargo_id;
-        //  $usuario->habilitado = 'S';
-        //$usuario->foto = $nombreImg;
-        //  $usuario->intentos = 5;
-        //  $usuario->created_at = now();
-         // guardar el usuario en la base de datos
-         //$usuario->save();
+        $file = $request->file('foto');
+        $fileName = $file->getClientOriginalName();
+        $filePath = public_path($fileName);
+        $path = $file->storeAs('public/imagenes', $fileName);
 
          $user = User::create([
             'nombres' => $request->nombres,
@@ -94,17 +65,27 @@ class colaboradorController extends Controller
             'telefono' => $request->telefono,
             'intentos' => $request->intentos,
             'habilitado' => $request->habilitado,
-            'foto' => $request->foto,
-
+            'foto' => $fileName,
         ]);
         $token = JWTAuth::fromUser($user);
-
-         // devolver una respuesta JSON con el nuevo user
          return response()->json([
              'user' => $user,
              'token' => $token,
              'success' => true
          ], 201);
+    }
+
+    public function obtenerFoto(Request $request)
+    {
+        
+        $file = public_path('storage\\imagenes\\'.$request->nombre);
+        if (!File::exists($file)) {
+            return 'No encontrado';
+        } else {
+            $type = File::mimeType($file);
+            $headers = array('Content-Type', $type);
+            return response()->file($file, $headers);
+        }
     }
 
     public function singIn(AuthRequest $request) {
@@ -194,7 +175,6 @@ class colaboradorController extends Controller
     {
         // return $request->dui;
         // die;
-
         // $colaborador = colaborador::findOrFail($request->dui)->update([
         //     'intentos' => 0
         // ]);
@@ -235,6 +215,15 @@ class colaboradorController extends Controller
         ]);
     }
 
+    public function editPassword(Request $request)
+    {
+        $colaborador = User::findOrFail($request->id)
+                    ->update(['password' => Hash::make($request->clave)]);
+        return response()->json([
+            'dataDB' => $colaborador,
+            'success' => true
+        ]);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -243,22 +232,27 @@ class colaboradorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        
-        $user = User::find($id);
+
+        //return $request;
+        $file = $request->file('foto');
+        $fileName = $file->getClientOriginalName();
+        $filePath = public_path($fileName);
+        $path = $file->storeAs('public/imagenes', $fileName);
+
+        $user = User::find($request->id);
         $user->update([
-            'foto' => $request->foto,
+            'foto' => $fileName,
             'dui' => $request->dui,
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
-            'agencia_id' => $request->agencia,
-            'departamento_id' => $request->departamento,
-            'cargo_id' => $request->cargo,
+            'agencia_id' => $request->agencia_id,
+            'departamento_id' => $request->departamento_id,
+            'cargo_id' => $request->cargo_id,
             'telefono' => $request->telefono,
             'correo' => $request->correo,
         ]);
-
         return response()->json([
             'dataDB' => $user,
             'success' => true
