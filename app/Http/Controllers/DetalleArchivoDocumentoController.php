@@ -13,9 +13,20 @@ class DetalleArchivoDocumentoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        
+        // $detalleDoc = DetalleArchivoDocumento::find($request->id);
+        // return response()->json([
+        //     'dataDB' => $detalleDoc,
+        //     'success' => true
+        // ]);
+
+        $detalleDoc = DetalleArchivoDocumento::where('documento_id', $request->id)->get();
+        return response()->json([
+            'dataDB' => $detalleDoc,
+            'success' => true
+        ]);
         
     }
 
@@ -53,7 +64,7 @@ class DetalleArchivoDocumentoController extends Controller
             ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
             ->join('permisos', 'permisos.documento_id','=','documentos.id')
             ->join('detalle_permisos','detalle_permisos.permiso_id','=','permisos.id')
-            ->select('documentos.tipoDocumento_id', 'detalle_archivo_documentos.nombreArchivo', 'permisos.tipoPermiso_id', 'permisos.documento_id', 'detalle_permisos.departamento_id', 'detalle_permisos.colaborador_id', 'detalle_archivo_documentos.fechaLimite')
+            ->select('documentos.tipoDocumento_id', 'detalle_archivo_documentos.nombreArchivo', 'permisos.tipoPermiso_id', 'permisos.documento_id', 'detalle_permisos.departamento_id', 'detalle_permisos.colaborador_id', 'detalle_archivo_documentos.fechaLimite', 'detalle_archivo_documentos.disponible')
             ->where('documentos.habilitado','=','S')
             ->get();
         // $documentos = DB::table('detalle_archivo_documentos')

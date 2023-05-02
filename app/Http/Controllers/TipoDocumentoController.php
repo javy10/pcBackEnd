@@ -46,9 +46,13 @@ class TipoDocumentoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-        //
+        $tipo = tipoDocumento::find($request->id);
+        return response()->json([
+            'dataDB' => $tipo,
+            'success' => true
+        ]);
     }
 
     /**

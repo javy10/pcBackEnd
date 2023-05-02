@@ -90,11 +90,13 @@ Route::controller(DocumentoController::class)->group(function() {
     Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
     Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
     Route::get('documentos/{nombre}', 'index')->name('documentos');
+    Route::get('documentoID/{id}', 'buscarID')->name('documentos');
   
 });
 
 Route::controller(DetalleArchivoDocumentoController::class)->group(function() {
     Route::get('documentos', 'show')->name('documentos');
+    Route::get('detalleDoc/{id}', 'index')->name('detalleDoc');
 });
 
 Route::controller(DetallePermisoController::class)->group(function() {

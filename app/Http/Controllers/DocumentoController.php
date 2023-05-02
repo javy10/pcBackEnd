@@ -146,6 +146,15 @@ class DocumentoController extends Controller
         ]);
     }
 
+    public function buscarID(Request $request)
+    {
+        $documento = Documento::find($request->id);
+        return response()->json([
+            'dataDB' => $documento,
+            'success' => true
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
