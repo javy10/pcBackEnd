@@ -101,4 +101,6 @@ Route::controller(DetalleArchivoDocumentoController::class)->group(function() {
 
 Route::controller(DetallePermisoController::class)->group(function() {
     Route::get('permisos', 'index')->name('permisos');
+    Route::get('detallePermisos/{id}', 'show')->name('permisos');
+    Route::get('detalleID/{id}', 'detalleID')->name('detallePer');
 });
