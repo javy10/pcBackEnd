@@ -69,20 +69,40 @@ class DocumentoController extends Controller
         $detalleDoc->disponible = $request->disponible;
         $detalleDoc->save();
 
-        // foreach($detalle as $itemDocs){
-            
-        //     $contenido = file_get_contents($itemDocs->urlPdf);
-        //     file_put_contents('/path/to/nuevo_archivo.pdf', $contenido, FILE_APPEND);
-        //     echo $contenido;
+       
+        // foreach($arr1 as $item){
+        //     $permiso = new Permiso();
+        //     $permiso->documento_id = $documento->id;
+        //     $permiso->tipoPermiso_id = $item;
+        //     $permiso->habilitado = 'S';
+        //     $permiso->save();
         // }
-        // return $detalle;
-        // die;
+        // foreach($arr2 as $data){
+        //     if($data != 0){
+        //         $detallePermiso = new DetallePermiso();
+        //         $detallePermiso->departamento_id = $data == 0 ? null : $data;
+        //         $detallePermiso->permiso_id = $permiso->id;
+        //         $detallePermiso->habilitado = 'S';
+        //         $detallePermiso->save();
+        //     }
+        // }
+        // foreach($arr3 as $datos) {
+        //     if($datos != 0){
+        //         $detallePermiso = new DetallePermiso();
+        //         $detallePermiso->colaborador_id = $datos == 0 ? null : $datos;
+        //         $detallePermiso->permiso_id = $permiso->id;
+        //         $detallePermiso->habilitado = 'S';
+        //         $detallePermiso->save();
+        //     }
+        // }
+
         foreach($arr1 as $item){
             $permiso = new Permiso();
             $permiso->documento_id = $documento->id;
             $permiso->tipoPermiso_id = $item;
             $permiso->habilitado = 'S';
             $permiso->save();
+
         }
         foreach($arr2 as $data){
             if($data != 0){
@@ -91,7 +111,6 @@ class DocumentoController extends Controller
                 $detallePermiso->permiso_id = $permiso->id;
                 $detallePermiso->habilitado = 'S';
                 $detallePermiso->save();
-                //echo $detallePermiso;
             }
         }
         foreach($arr3 as $datos) {
@@ -101,9 +120,10 @@ class DocumentoController extends Controller
                 $detallePermiso->permiso_id = $permiso->id;
                 $detallePermiso->habilitado = 'S';
                 $detallePermiso->save();
-                //echo $detallePermiso;
             }
         }
+
+
         return response()->json([
             
             // 'documento' => $documento,
