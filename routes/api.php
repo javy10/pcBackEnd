@@ -50,6 +50,7 @@ Route::controller(AuthController::class)->group(function() {
 
 Route::controller(colaboradorController::class)->group(function() {
     Route::get('colaboradores','index')->name('colaboradores');
+    Route::get('colaboradoresDeshabilitados','Deshabilitados')->name('colaboradoresDeshabilitados');
     Route::post('colaborador','createColaborador')->name('createcolaborador');
     Route::get('eliminarcolaborador/{id}','edit')->name('eliminarcolaborador');
     Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
@@ -80,8 +81,14 @@ Route::controller(cargoController::class)->group(function() {
 });
 
 Route::controller(TipoDocumentoController::class)->group(function() {
+    Route::post('tipoDocumento','create')->name('tipoDocumento');
     Route::get('tipoDocumentos','index')->name('tipoDocumentos');
+    Route::post('buscarTipoDocumentos','buscarTipo')->name('tipoDocumentos');
+    Route::get('tiposDocumentos','tipoDocumentos')->name('tipoDocumentos');
     Route::get('tipoDocumentos/{id}','show')->name('buscartipoDocumentosId');
+    Route::get('eliminarTipoDocumento/{id}','edit')->name('eliminartipoDocumentosId');
+    Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
+    Route::post('editar','update')->name('editar');
 });
 
 Route::controller(DocumentoController::class)->group(function() {

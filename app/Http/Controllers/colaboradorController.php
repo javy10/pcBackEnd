@@ -36,6 +36,22 @@ class colaboradorController extends Controller
         ]);
     }
 
+    public function Deshabilitados()
+    {
+         $colaborador = DB::table('users')
+                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.correo AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos')
+                ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+                ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+                ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+                ->where('users.habilitado', 'N')
+                ->get();
+
+        return response()->json([
+            'dataDB' => $colaborador,
+            'success' => true
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

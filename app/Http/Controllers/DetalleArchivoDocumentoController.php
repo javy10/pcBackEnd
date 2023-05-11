@@ -62,10 +62,10 @@ class DetalleArchivoDocumentoController extends Controller
         
         $documentos = DB::table('documentos')
             ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
-            ->join('permisos', 'permisos.documento_id','=','documentos.id')
-            ->join('detalle_permisos','detalle_permisos.permiso_id','=','permisos.id')
+            ->join('detalle_permisos', 'detalle_permisos.documento_id','=','documentos.id')
+            ->join('permisos','detalle_permisos.permiso_id','=','permisos.id')
             ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
-            ->select('documentos.tipoDocumento_id', 'tipo_documentos.tipo', 'detalle_archivo_documentos.nombreArchivo', 'permisos.tipoPermiso_id', 'permisos.documento_id', 'detalle_permisos.departamento_id', 'detalle_permisos.colaborador_id', 'detalle_archivo_documentos.fechaLimite', 'detalle_archivo_documentos.disponible')
+            ->select('documentos.tipoDocumento_id', 'tipo_documentos.tipo', 'detalle_archivo_documentos.nombreArchivo', 'permisos.tipoPermiso_id', 'detalle_permisos.documento_id', 'detalle_permisos.departamento_id', 'detalle_permisos.colaborador_id', 'detalle_archivo_documentos.fechaLimite', 'detalle_archivo_documentos.disponible')
             ->where('documentos.habilitado','=','S')
             ->get();
         // $documentos = DB::table('detalle_archivo_documentos')

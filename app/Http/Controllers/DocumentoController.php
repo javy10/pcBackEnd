@@ -38,15 +38,19 @@ class DocumentoController extends Controller
      */
     public function create(Request $request)
     {
+
+        // return $request;
+        // die;
+
         $arr1 = json_decode(( $request->tipoPermiso_id ));
         $arr2 = json_decode(( $request->departamento_id ));
         $arr3 = json_decode(( $request->colaborador_id ));
         // $detalle = json_decode(( $request->detalleDoc ));
 
         $file = $request->file('url');
-        $fileName = $file->getClientOriginalName();
-        $filePath = public_path($fileName);
-        $path = $file->storeAs('public/pdf', $fileName);
+        //$fileName = $file->getClientOriginalName();
+        $filePath = public_path($request->titulo);
+        $path = $file->storeAs('public/pdf', $request->titulo);
 
         //echo $path;
         ////// insertando datos
@@ -64,41 +68,13 @@ class DocumentoController extends Controller
         $detalleDoc->lectura = $request->lectura;
         $detalleDoc->fechaLimite = $request->fechaLimite == '' ? null : $request->fechaLimite;
         $detalleDoc->habilitado = 'S';
-        $detalleDoc->nombreArchivo = $fileName;
-        $detalleDoc->urlArchivo = $filePath;
+        $detalleDoc->nombreArchivo = $request->titulo;
+        //$detalleDoc->urlArchivo = $filePath;
         $detalleDoc->disponible = $request->disponible;
         $detalleDoc->save();
 
-       
-        // foreach($arr1 as $item){
-        //     $permiso = new Permiso();
-        //     $permiso->documento_id = $documento->id;
-        //     $permiso->tipoPermiso_id = $item;
-        //     $permiso->habilitado = 'S';
-        //     $permiso->save();
-        // }
-        // foreach($arr2 as $data){
-        //     if($data != 0){
-        //         $detallePermiso = new DetallePermiso();
-        //         $detallePermiso->departamento_id = $data == 0 ? null : $data;
-        //         $detallePermiso->permiso_id = $permiso->id;
-        //         $detallePermiso->habilitado = 'S';
-        //         $detallePermiso->save();
-        //     }
-        // }
-        // foreach($arr3 as $datos) {
-        //     if($datos != 0){
-        //         $detallePermiso = new DetallePermiso();
-        //         $detallePermiso->colaborador_id = $datos == 0 ? null : $datos;
-        //         $detallePermiso->permiso_id = $permiso->id;
-        //         $detallePermiso->habilitado = 'S';
-        //         $detallePermiso->save();
-        //     }
-        // }
-
         foreach($arr1 as $item){
             $permiso = new Permiso();
-            $permiso->documento_id = $documento->id;
             $permiso->tipoPermiso_id = $item;
             $permiso->habilitado = 'S';
             $permiso->save();
@@ -107,6 +83,7 @@ class DocumentoController extends Controller
         foreach($arr2 as $data){
             if($data != 0){
                 $detallePermiso = new DetallePermiso();
+                $detallePermiso->documento_id = $documento->id;
                 $detallePermiso->departamento_id = $data == 0 ? null : $data;
                 $detallePermiso->permiso_id = $permiso->id;
                 $detallePermiso->habilitado = 'S';
@@ -116,6 +93,7 @@ class DocumentoController extends Controller
         foreach($arr3 as $datos) {
             if($datos != 0){
                 $detallePermiso = new DetallePermiso();
+                $detallePermiso->documento_id = $documento->id;
                 $detallePermiso->colaborador_id = $datos == 0 ? null : $datos;
                 $detallePermiso->permiso_id = $permiso->id;
                 $detallePermiso->habilitado = 'S';
@@ -216,3 +194,34 @@ class DocumentoController extends Controller
         //
     }
 }
+
+
+/** 
+ * 
+ *   
+        // foreach($arr1 as $item){
+        //     $permiso = new Permiso();
+        //     $permiso->documento_id = $documento->id;
+        //     $permiso->tipoPermiso_id = $item;
+        //     $permiso->habilitado = 'S';
+        //     $permiso->save();
+        // }
+        // foreach($arr2 as $data){
+        //     if($data != 0){
+        //         $detallePermiso = new DetallePermiso();
+        //         $detallePermiso->departamento_id = $data == 0 ? null : $data;
+        //         $detallePermiso->permiso_id = $permiso->id;
+        //         $detallePermiso->habilitado = 'S';
+        //         $detallePermiso->save();
+        //     }
+        // }
+        // foreach($arr3 as $datos) {
+        //     if($datos != 0){
+        //         $detallePermiso = new DetallePermiso();
+        //         $detallePermiso->colaborador_id = $datos == 0 ? null : $datos;
+        //         $detallePermiso->permiso_id = $permiso->id;
+        //         $detallePermiso->habilitado = 'S';
+        //         $detallePermiso->save();
+        //     }
+        // }
+ * **/

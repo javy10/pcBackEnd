@@ -11,7 +11,6 @@ class Permiso extends Model
 
     protected $fillable = [
         'id',
-        'documento_id',
         'tipoPermiso_id',
         'habilitado'
     ];
@@ -19,7 +18,5 @@ class Permiso extends Model
     public function TipoPermiso(){
         return $this->belongsTo(TipoPermiso::class);
     }
-    public function Documento(){
-        return $this->belongsTo(Documento::class);
-    }
+   
 }

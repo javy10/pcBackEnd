@@ -13,6 +13,7 @@ class DetallePermiso extends Model
         'colaborador_id',
         'permiso_id',
         'departamento_id',
+        'documento_id',
         'habilitado'
     ];
 
@@ -24,5 +25,8 @@ class DetallePermiso extends Model
     }
     public function Permiso(){
         return $this->belongsTo(Permiso::class);
+    }
+    public function Documento(){
+        return $this->belongsTo(Documento::class);
     }
 }

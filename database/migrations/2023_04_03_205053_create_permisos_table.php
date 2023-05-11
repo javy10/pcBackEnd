@@ -15,11 +15,9 @@ return new class extends Migration
     {
         Schema::create('permisos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('documento_id');
             $table->unsignedBigInteger('tipoPermiso_id');
             $table->char('habilitado');
             $table->timestamps();
-            $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
             $table->foreign('tipoPermiso_id')->references('id')->on('tipo_permisos')->onDelete('cascade');
         });
     }

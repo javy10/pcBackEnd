@@ -17,8 +17,8 @@ class DetallePermisoController extends Controller
         //
         $permisos = DB::table('detalle_permisos')
             ->join('permisos', 'detalle_permisos.permiso_id', '=', 'permisos.id')
-            ->join('documentos', 'permisos.documento_id','=','documentos.id')
-            ->select('permisos.documento_id', 'permisos.tipoPermiso_id', 'detalle_permisos.departamento_id', 'detalle_permisos.colaborador_id', 'detalle_permisos.created_at')
+            ->join('documentos', 'detalle_permisos.documento_id','=','documentos.id')
+            ->select('detalle_permisos.documento_id', 'permisos.tipoPermiso_id', 'detalle_permisos.departamento_id', 'detalle_permisos.colaborador_id', 'detalle_permisos.created_at')
             ->get();
 
         return response()->json([
@@ -61,8 +61,8 @@ class DetallePermisoController extends Controller
             ->join('permisos', 'detalle_permisos.permiso_id', '=', 'permisos.id')
             ->leftJoin('departamentos', 'detalle_permisos.departamento_id','=','departamentos.id')
             ->leftJoin('users', 'detalle_permisos.colaborador_id','=','users.id')
-            ->select('permisos.documento_id', 'permisos.tipoPermiso_id', 'permisos.id AS permiso_id', 'detalle_permisos.departamento_id', 'departamentos.nombre', 'detalle_permisos.colaborador_id', 'users.nombres', 'users.apellidos', 'detalle_permisos.created_at', 'detalle_permisos.id')
-            ->where('permisos.documento_id', '=', $request->id)
+            ->select('detalle_permisos.documento_id', 'permisos.tipoPermiso_id', 'permisos.id AS permiso_id', 'detalle_permisos.departamento_id', 'departamentos.nombre', 'detalle_permisos.colaborador_id', 'users.nombres', 'users.apellidos', 'detalle_permisos.created_at', 'detalle_permisos.id')
+            ->where('detalle_permisos.documento_id', '=', $request->id)
             ->get();
 
         return response()->json([
@@ -79,7 +79,7 @@ class DetallePermisoController extends Controller
             ->join('permisos', 'detalle_permisos.permiso_id', '=', 'permisos.id')
             ->leftJoin('departamentos', 'detalle_permisos.departamento_id','=','departamentos.id')
             ->leftJoin('users', 'detalle_permisos.colaborador_id','=','users.id')
-            ->select('permisos.documento_id', 'permisos.tipoPermiso_id', 'permisos.id AS permiso_id', 'detalle_permisos.departamento_id', 'departamentos.nombre', 'detalle_permisos.colaborador_id', 'users.nombres', 'users.apellidos', 'detalle_permisos.created_at', 'detalle_permisos.id')
+            ->select('detalle_permisos.documento_id', 'permisos.tipoPermiso_id', 'permisos.id AS permiso_id', 'detalle_permisos.departamento_id', 'departamentos.nombre', 'detalle_permisos.colaborador_id', 'users.nombres', 'users.apellidos', 'detalle_permisos.created_at', 'detalle_permisos.id')
             ->where('Detalle_permisos.id', '=', $request->id)
             ->get();
 

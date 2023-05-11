@@ -17,11 +17,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('colaborador_id');
             $table->unsignedBigInteger('departamento_id');
+            $table->unsignedBigInteger('documento_id');
             $table->unsignedBigInteger('permiso_id');
             $table->char('habilitado');
             $table->timestamps();
             $table->foreign('colaborador_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('departamento_id')->references('id')->on('departamentos')->onDelete('cascade');
+            $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
             $table->foreign('permiso_id')->references('id')->on('permisos')->onDelete('cascade');
         });
     }

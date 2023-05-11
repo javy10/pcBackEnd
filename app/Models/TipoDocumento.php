@@ -8,5 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class tipoDocumento extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'habilitado',
+        'tipo'
+    ];
    
 }

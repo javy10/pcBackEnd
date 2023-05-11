@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\tipoDocumento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TipoDocumentoController extends Controller
 {
@@ -15,7 +16,42 @@ class TipoDocumentoController extends Controller
     public function index()
     {
         //
+        //$tipoDocumento = tipoDocumento::all();
+        $tipoDocumento = tipoDocumento::where('habilitado', 'S')->get();
+        return $tipoDocumento;
+
+    }
+
+    public function buscarTipo(Request $request)
+    {
+        //
+        //$tipoDocumento = tipoDocumento::all();
+        // $tipoDocumento = tipoDocumento::where('habilitado', 'S')->get();
+        // return $tipoDocumento;
+
+        // return $request;
+        // die;
+
+        $documentos = DB::table('tipo_documentos')
+            ->join('documentos', 'documentos.tipoDocumento_id', '=', 'tipo_documentos.id')
+            ->join('detalle_permisos','detalle_permisos.documento_id','=','documentos.id')
+            ->select('tipo_documentos.tipo', 'tipo_documentos.id')
+            ->where('tipo_documentos.habilitado','=','S')
+            ->Where('detalle_permisos.colaborador_id','=', $request->idC)
+            ->orWhere('detalle_permisos.departamento_id','=', $request->idD)
+            ->get();
+        return response()->json([
+            'dataDB' => $documentos,
+            'success' => true
+        ]);
+        
+    }
+
+    public function tipoDocumentos()
+    {
+        //
         $tipoDocumento = tipoDocumento::all();
+        //$tipoDocumento = tipoDocumento::where('habilitado', 'S')->get();
         return $tipoDocumento;
     }
 
@@ -24,9 +60,19 @@ class TipoDocumentoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+
+        //return $request->tipo;
+        $tipo = tipoDocumento::create([
+            'tipo' => $request->tipo,
+            'habilitado' => 'S'
+        ]);
+        
+         return response()->json([
+             'tipo' => $tipo,
+             'success' => true
+         ], 201);
     }
 
     /**
@@ -61,9 +107,26 @@ class TipoDocumentoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+        $tipoDoc = tipoDocumento::findOrFail($request->id)->update([
+            'habilitado' => 'N'
+        ]);
+        return response()->json([
+            'dataDB' => $tipoDoc,
+            'success' => true
+        ]);
+    }
+
+    public function desbloquear(Request $request)
+    {
+        $tipo = tipoDocumento::findOrFail($request->id)->update([
+            'habilitado' => 'S'
+        ]);
+        return response()->json([
+            'dataDB' => $tipo,
+            'success' => true
+        ]);
     }
 
     /**
@@ -73,9 +136,17 @@ class TipoDocumentoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        
+        $tipo = tipoDocumento::find($request->id);
+        $tipo->update([
+            'tipo' => $request->tipo
+        ]);
+        return response()->json([
+            'dataDB' => $tipo,
+            'success' => true
+        ]);
     }
 
     /**
