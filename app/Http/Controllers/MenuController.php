@@ -2,19 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
 use Illuminate\Http\Request;
-use App\Models\Permiso;
+use Illuminate\Support\Facades\DB;
 
-class PermisoController extends Controller
+class MenuController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $menus = Menu::all();
+        return $menus;
+
+        // $menus = DB::table('menus')
+        //     ->join('detalle_permisos_menus','detalle_permisos_menus.menu_id','=','menus.id')
+        //     ->select('menus.nombre', 'menus.id')
+        //     ->where('menus.habilitado','=','S')
+        //     ->Where('detalle_permisos_menus.colaborador_id','=', $request->idColaborador)
+        //     ->orWhere('detalle_permisos_menus.cargo_id','=', $request->idCargo)
+        //     ->get();
+        // return response()->json([
+        //     'dataDB' => $menus,
+        //     'success' => true
+        // ]);
+        
     }
 
     /**
@@ -67,24 +82,9 @@ class PermisoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-
-        // return $request;
-        // die;
-
-        if($request->permiso_id) {
-            $documento = Permiso::find($request->permiso_id);
-            $documento->update([
-                'tipoPermiso_id' => $request->tipoPermiso_id,
-                'updated_at' => $request->fechaRegistro,
-                // 'habilitado' => 'S',
-            ]);
-        } 
-
-        return response()->json([
-            'success' => true
-        ], 201);
+        //
     }
 
     /**

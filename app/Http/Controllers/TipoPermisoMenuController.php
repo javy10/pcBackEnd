@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Permiso;
 
-class PermisoController extends Controller
+class TipoPermisoMenuController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -67,24 +66,9 @@ class PermisoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-
-        // return $request;
-        // die;
-
-        if($request->permiso_id) {
-            $documento = Permiso::find($request->permiso_id);
-            $documento->update([
-                'tipoPermiso_id' => $request->tipoPermiso_id,
-                'updated_at' => $request->fechaRegistro,
-                // 'habilitado' => 'S',
-            ]);
-        } 
-
-        return response()->json([
-            'success' => true
-        ], 201);
+        //
     }
 
     /**

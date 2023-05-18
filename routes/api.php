@@ -12,6 +12,9 @@ use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\TipoDocumentoController;
 use App\Http\Controllers\DetalleArchivoDocumentoController;
 use App\Http\Controllers\DetallePermisoController;
+use App\Http\Controllers\DetallePermisoMenuController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\PermisoController;
 use App\Models\DetallePermiso;
 
 /*
@@ -95,19 +98,44 @@ Route::controller(DocumentoController::class)->group(function() {
     Route::post('documentos', 'create')->name('documentos');
     Route::get('listaDocumentos', 'show')->name('documentos');
     Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
-    Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
     Route::get('documentos/{nombre}', 'index')->name('documentos');
     Route::get('documentoID/{id}', 'buscarID')->name('documentos');
-  
+    Route::post('editarDocumento','update')->name('editarDocumento');
+    Route::post('guardarPermiso','crearPermiso')->name('crearPermiso');
+    
 });
 
 Route::controller(DetalleArchivoDocumentoController::class)->group(function() {
     Route::get('documentos', 'show')->name('documentos');
+    Route::post('documentosList', 'obtenerDocumentosID')->name('obtenerDocumentosID');
     Route::get('detalleDoc/{id}', 'index')->name('detalleDoc');
+    Route::get('detalleDocumento/{id}', 'buscarDetalle')->name('detalleDocumento');
+    Route::post('guardarDetalle', 'create')->name('guardarDetalle');
+    Route::post('editarDetalleDocumento','update')->name('editarDetalleDocumento');
+    Route::get('eliminarDetalledocumentos/{id}', 'edit')->name('documentos');
 });
 
 Route::controller(DetallePermisoController::class)->group(function() {
     Route::get('permisos', 'index')->name('permisos');
+    Route::get('obtenerDetallePermiso', 'obtenerDetallePermiso')->name('obtenerDetallePermiso');
     Route::get('detallePermisos/{id}', 'show')->name('permisos');
+    Route::get('detalleDocPermisos/{id}', 'obtenerDetallePermisoID')->name('detalleDocPermisos');
     Route::get('detalleID/{id}', 'detalleID')->name('detallePer');
+    Route::post('editarDetallePermiso','update')->name('editarDetallePermiso');
+    Route::get('eliminarDetallePermiso/{id}','edit')->name('eliminarDetallePermiso');
+});
+
+Route::controller(PermisoController::class)->group(function() {
+    Route::post('editarPermiso','update')->name('editarPermiso');
+});
+
+Route::controller(MenuController::class)->group(function() {
+    Route::get('menus','index')->name('menus');
+});
+
+Route::controller(DetallePermisoMenuController::class)->group(function() {
+    Route::get('obtenerDetalle', 'obtenerDetalle')->name('obtenerDetalle');
+    Route::post('detallePermisosMenu','index')->name('detalles');
+    Route::post('configuracion', 'create')->name('configuracion');
+    Route::post('editarconfiguracion','update')->name('editarconfiguracion');
 });

@@ -25,4 +25,9 @@ class Documento extends Model
     public function TipoDocumento(){
         return $this->belongsTo(TipoDocumento::class);
     }
+
+    public function detalle()
+    {
+        return $this->hasMany(DetalleArchivoDocumento::class);
+    }
 }

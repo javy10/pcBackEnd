@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DetalleArchivoDocumento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Documento;
 
 class DetalleArchivoDocumentoController extends Controller
 {
@@ -22,7 +23,18 @@ class DetalleArchivoDocumentoController extends Controller
         //     'success' => true
         // ]);
 
-        $detalleDoc = DetalleArchivoDocumento::where('documento_id', $request->id)->get();
+        $detalleDoc = DetalleArchivoDocumento::where('documento_id', $request->id)->where('habilitado', 'S')->get();
+        return response()->json([
+            'dataDB' => $detalleDoc,
+            'success' => true
+        ]);
+        
+    }
+
+    public function buscarDetalle(Request $request)
+    {
+
+        $detalleDoc = DetalleArchivoDocumento::where('id', $request->id)->get();
         return response()->json([
             'dataDB' => $detalleDoc,
             'success' => true
@@ -35,9 +47,27 @@ class DetalleArchivoDocumentoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+
+        $file = $request->file('url');
+        //$fileName = $file->getClientOriginalName();
+        $filePath = public_path($request->titulo);
+        $path = $file->storeAs('public/pdf', $request->titulo);
+
+        //$documento = new Documento();
+        $ultimoId = Documento::latest()->first()->id;
+
+        $detalleDoc = new DetalleArchivoDocumento();
+        $detalleDoc->documento_id = $ultimoId;
+        $detalleDoc->descripcion = $request->descripcionDetalle;
+        $detalleDoc->lectura = $request->lectura;
+        $detalleDoc->fechaLimite = $request->fechaLimite == '' ? null : $request->fechaLimite;
+        $detalleDoc->habilitado = 'S';
+        $detalleDoc->nombreArchivo = $request->titulo;
+        //$detalleDoc->urlArchivo = $filePath;
+        $detalleDoc->disponible = $request->disponible;
+        $detalleDoc->save();
     }
 
     /**
@@ -59,20 +89,65 @@ class DetalleArchivoDocumentoController extends Controller
      */
     public function show()
     {
-        
+        // return $request;
+        // die;
         $documentos = DB::table('documentos')
             ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
             ->join('detalle_permisos', 'detalle_permisos.documento_id','=','documentos.id')
             ->join('permisos','detalle_permisos.permiso_id','=','permisos.id')
             ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
-            ->select('documentos.tipoDocumento_id', 'tipo_documentos.tipo', 'detalle_archivo_documentos.nombreArchivo', 'permisos.tipoPermiso_id', 'detalle_permisos.documento_id', 'detalle_permisos.departamento_id', 'detalle_permisos.colaborador_id', 'detalle_archivo_documentos.fechaLimite', 'detalle_archivo_documentos.disponible')
+            ->distinct()->select('documentos.tipoDocumento_id', 'tipo_documentos.tipo', 'detalle_archivo_documentos.nombreArchivo', 'permisos.tipoPermiso_id', 'detalle_permisos.documento_id', 'detalle_permisos.departamento_id', 'detalle_permisos.colaborador_id', 'detalle_archivo_documentos.fechaLimite', 'detalle_archivo_documentos.disponible', 'detalle_archivo_documentos.lectura')
             ->where('documentos.habilitado','=','S')
             ->get();
-        // $documentos = DB::table('detalle_archivo_documentos')
-        //     ->join('documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
-        //     ->select('documentos.tipoDocumento_id', 'detalle_archivo_documentos.nombreArchivo', 'documentos.id')
-        //     ->get();
+        return response()->json([
+            'dataDB' => $documentos,
+            'success' => true
+        ]);
 
+        // $documentos = DB::table('documentos')
+        //     ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
+        //     ->join('detalle_permisos', 'detalle_permisos.documento_id','=','documentos.id')
+        //     ->join('permisos','detalle_permisos.permiso_id','=','permisos.id')
+        //     ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
+        //     ->distinct()->select('detalle_archivo_documentos.nombreArchivo',  'detalle_archivo_documentos.fechaLimite', 'detalle_archivo_documentos.disponible', 'detalle_archivo_documentos.lectura', 'documentos.tipoDocumento_id', 'tipo_documentos.tipo', 'detalle_permisos.documento_id')
+        //     ->where(function ($query) use ($request) {
+        //         $query->where('(detalle_permisos.colaborador_id', '=', $request->idC)
+        //               ->orWhere('detalle_permisos.departamento_id', '=', $request->idD);
+        //     })
+        //     ->where('detalle_archivo_documentos.disponible','=','0')
+        //     ->where('detalle_archivo_documentos.lectura','=','0')
+        //     ->where('detalle_archivo_documentos.habilitado','=','S')
+        //     ->get();
+        // return response()->json([
+        //     'dataDB' => $documentos,
+        //     'success' => true
+        // ]);
+    }
+
+    public function obtenerDocumentosID(Request $request)
+    {
+        // return $request;
+        // die;
+
+        $documentos = DB::table('documentos')
+            ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
+            ->join('detalle_permisos', 'detalle_permisos.documento_id','=','documentos.id')
+            ->join('permisos','detalle_permisos.permiso_id','=','permisos.id')
+            ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
+            ->distinct()->select('detalle_archivo_documentos.nombreArchivo',  'detalle_archivo_documentos.fechaLimite', 'detalle_archivo_documentos.disponible', 'detalle_archivo_documentos.lectura', 'documentos.tipoDocumento_id', 'tipo_documentos.tipo', 'detalle_permisos.documento_id')
+
+            // ->where(function ($query) use ($request) {
+            //     $query->where('(detalle_permisos.colaborador_id', '=', $request->idC)
+            //           ->orWhere('detalle_permisos.departamento_id', '=', $request->idD);
+            // })
+
+            ->where('detalle_permisos.colaborador_id', '=', $request->idC)
+            ->orWhere('detalle_permisos.departamento_id', '=', $request->idD)
+
+            ->where('detalle_archivo_documentos.disponible','=','0')
+            ->where('detalle_archivo_documentos.lectura','=','0')
+            ->where('detalle_archivo_documentos.habilitado','=','S')
+            ->get();
         return response()->json([
             'dataDB' => $documentos,
             'success' => true
@@ -85,9 +160,16 @@ class DetalleArchivoDocumentoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
         //
+        $documentos = DetalleArchivoDocumento::findOrFail($request->id)->update([
+            'habilitado' => 'N'
+        ]);
+        return response()->json([
+            'dataDB' => $documentos,
+            'success' => true
+        ]);
     }
 
     /**
@@ -97,9 +179,52 @@ class DetalleArchivoDocumentoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+
+        // return $request;
+        // die;
+        //echo $request->url;
+        if($request->id != 'undefined') {
+            $file = $request->file('url');
+            if($file != null || $file != '') {
+                //$fileName = $file->getClientOriginalName();
+                $filePath = public_path($request->titulo);
+                $path = $file->storeAs('public/pdf', $request->titulo);
+            }
+            $detalleDoc = DetalleArchivoDocumento::find($request->id);
+            $detalleDoc->update([
+                'documento_id' => $request->documento_id,
+                'descripcion' => $request->descripcionDetalle,
+                'lectura' => $request->lectura,
+                'fechaLimite' => $request->fechaLimite == '' ? null : $request->fechaLimite,
+                'updated_at' => $request->updated_at,
+                'habilitado' => 'S',
+                'nombreArchivo' => $request->titulo,
+                'disponible' => $request->disponible,
+            ]);
+        }
+        else 
+        {
+            $file = $request->file('url');
+            //$fileName = $file->getClientOriginalName();
+            $filePath = public_path($request->titulo);
+            $path = $file->storeAs('public/pdf', $request->titulo);
+
+            //$documento = new Documento();
+            //$ultimoId = Documento::latest()->first()->id;
+
+            $detalleDoc = new DetalleArchivoDocumento();
+            $detalleDoc->documento_id = $request->documento_id;
+            $detalleDoc->descripcion = $request->descripcionDetalle;
+            $detalleDoc->lectura = $request->lectura;
+            $detalleDoc->fechaLimite = $request->fechaLimite == '' ? null : $request->fechaLimite;
+            $detalleDoc->habilitado = 'S';
+            $detalleDoc->nombreArchivo = $request->titulo;
+            //$detalleDoc->urlArchivo = $filePath;
+            $detalleDoc->disponible = $request->disponible;
+            $detalleDoc->save();
+        }
     }
 
     /**

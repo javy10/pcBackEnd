@@ -34,11 +34,20 @@ class TipoDocumentoController extends Controller
 
         $documentos = DB::table('tipo_documentos')
             ->join('documentos', 'documentos.tipoDocumento_id', '=', 'tipo_documentos.id')
+            ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
             ->join('detalle_permisos','detalle_permisos.documento_id','=','documentos.id')
-            ->select('tipo_documentos.tipo', 'tipo_documentos.id')
+            ->distinct()->select('tipo_documentos.tipo', 'tipo_documentos.id')
+
+            // ->Where('detalle_permisos.colaborador_id','=', $request->idC)
+            // ->orWhere('detalle_permisos.departamento_id','=', $request->idD)
+
+            ->where(function ($query) use ($request) {
+                $query->Where('detalle_permisos.colaborador_id','=', $request->idC)
+                    ->orWhere('detalle_permisos.departamento_id','=', $request->idD);
+            })
+
             ->where('tipo_documentos.habilitado','=','S')
-            ->Where('detalle_permisos.colaborador_id','=', $request->idC)
-            ->orWhere('detalle_permisos.departamento_id','=', $request->idD)
+            ->where('detalle_archivo_documentos.disponible','=','0')
             ->get();
         return response()->json([
             'dataDB' => $documentos,

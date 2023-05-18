@@ -39,68 +39,24 @@ class DocumentoController extends Controller
     public function create(Request $request)
     {
 
-        // return $request;
+        // return $request->url . $request->detalleDoc;
         // die;
 
-        $arr1 = json_decode(( $request->tipoPermiso_id ));
-        $arr2 = json_decode(( $request->departamento_id ));
-        $arr3 = json_decode(( $request->colaborador_id ));
-        // $detalle = json_decode(( $request->detalleDoc ));
+        // $arr1 = json_decode(( $request->tipoPermiso_id ));
+        // $arr2 = json_decode(( $request->departamento_id ));
+        // $arr3 = json_decode(( $request->colaborador_id ));
+        //$detalle = json_decode(( $request->detalleDoc ));
 
-        $file = $request->file('url');
-        //$fileName = $file->getClientOriginalName();
-        $filePath = public_path($request->titulo);
-        $path = $file->storeAs('public/pdf', $request->titulo);
 
         //echo $path;
         ////// insertando datos
         $documento = new Documento();
         $documento->titulo = $request->titulo;
-        $documento->descripcion = $request->descripcion;
+        $documento->descripcion = $request->descripcionDoc;
         $documento->habilitado = 'S';
         $documento->colaborador_id = $request->usuario_id;
         $documento->tipoDocumento_id = $request->tipoDocumento_id;
         $documento->save();
-
-        $detalleDoc = new DetalleArchivoDocumento();
-        $detalleDoc->documento_id = $documento->id;
-        $detalleDoc->descripcion = $request->descripcionDetalle;
-        $detalleDoc->lectura = $request->lectura;
-        $detalleDoc->fechaLimite = $request->fechaLimite == '' ? null : $request->fechaLimite;
-        $detalleDoc->habilitado = 'S';
-        $detalleDoc->nombreArchivo = $request->titulo;
-        //$detalleDoc->urlArchivo = $filePath;
-        $detalleDoc->disponible = $request->disponible;
-        $detalleDoc->save();
-
-        foreach($arr1 as $item){
-            $permiso = new Permiso();
-            $permiso->tipoPermiso_id = $item;
-            $permiso->habilitado = 'S';
-            $permiso->save();
-
-        }
-        foreach($arr2 as $data){
-            if($data != 0){
-                $detallePermiso = new DetallePermiso();
-                $detallePermiso->documento_id = $documento->id;
-                $detallePermiso->departamento_id = $data == 0 ? null : $data;
-                $detallePermiso->permiso_id = $permiso->id;
-                $detallePermiso->habilitado = 'S';
-                $detallePermiso->save();
-            }
-        }
-        foreach($arr3 as $datos) {
-            if($datos != 0){
-                $detallePermiso = new DetallePermiso();
-                $detallePermiso->documento_id = $documento->id;
-                $detallePermiso->colaborador_id = $datos == 0 ? null : $datos;
-                $detallePermiso->permiso_id = $permiso->id;
-                $detallePermiso->habilitado = 'S';
-                $detallePermiso->save();
-            }
-        }
-
 
         return response()->json([
             
@@ -111,6 +67,26 @@ class DocumentoController extends Controller
             'success' => true
         ], 201);
 
+    }
+
+    public function crearPermiso(Request $request) 
+    {
+        $permiso = new Permiso();
+        $permiso->tipoPermiso_id = $request->tipoPermiso_id;
+        $permiso->habilitado = 'S';
+        $permiso->save();
+
+        $detallePermiso = new DetallePermiso();
+        $detallePermiso->documento_id = $request->documento_id;
+        $detallePermiso->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
+        $detallePermiso->colaborador_id = $request->colaborador_id == 0 ? null : $request->colaborador_id;
+        $detallePermiso->permiso_id = $permiso->id;
+        $detallePermiso->habilitado = 'S';
+        $detallePermiso->save();
+
+        return response()->json([
+            'success' => true
+        ], 201);
     }
 
     /**
@@ -132,10 +108,21 @@ class DocumentoController extends Controller
      */
     public function show()
     {
-        $documentos = DB::table('detalle_archivo_documentos')
-            ->join('documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
+        // $documentos = DB::table('detalle_archivo_documentos')
+        //     ->join('documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
+        //     ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
+        //     ->select('documentos.id','documentos.titulo','tipo_documentos.tipo','documentos.tipoDocumento_id', 'detalle_archivo_documentos.nombreArchivo','documentos.created_at')
+        //     ->where('documentos.habilitado','=','S')
+        //     ->where('disponible', '=', 0)
+        //     ->get();
+        // return response()->json([
+        //     'dataDB' => $documentos,
+        //     'success' => true
+        // ]);
+
+        $documentos = DB::table('documentos')
             ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
-            ->select('documentos.id','documentos.titulo','tipo_documentos.tipo','documentos.tipoDocumento_id', 'detalle_archivo_documentos.nombreArchivo','documentos.created_at')
+            ->select('documentos.id','documentos.titulo','tipo_documentos.tipo','documentos.tipoDocumento_id','documentos.created_at')
             ->where('documentos.habilitado','=','S')
             ->get();
         return response()->json([
@@ -178,9 +165,31 @@ class DocumentoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+
+        // return $request;
+        // die;
+
+        if($request->documento_id) {
+            $documento = Documento::find($request->documento_id);
+            $documento->update([
+                'titulo' => $request->titulo,
+                'descripcion' => $request->descripcion,
+                'tipoDocumento_id' => $request->tipoDocumento_id,
+                'updated_at' => $request->updated_at,
+                // 'habilitado' => 'S',
+            ]);
+        } else {
+            
+        }
+
+        return response()->json([
+            // 'permiso' => $permiso,
+            // 'detallePermiso' => $detallePermiso,
+            // 'detalleDocumento' => $detalleDoc,
+            'success' => true
+        ], 201);
     }
 
     /**
@@ -191,7 +200,12 @@ class DocumentoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // $detallePermiso = new DetallePermiso();
+        //         $detallePermiso->documento_id = $documento->id;
+        //         $detallePermiso->departamento_id = $data == 0 ? null : $data;
+        //         $detallePermiso->permiso_id = $permiso->id;
+        //         $detallePermiso->habilitado = 'S';
+        //         $detallePermiso->save();
     }
 }
 
