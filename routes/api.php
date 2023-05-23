@@ -13,6 +13,7 @@ use App\Http\Controllers\TipoDocumentoController;
 use App\Http\Controllers\DetalleArchivoDocumentoController;
 use App\Http\Controllers\DetallePermisoController;
 use App\Http\Controllers\DetallePermisoMenuController;
+use App\Http\Controllers\LogsEntradaSalidaController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PermisoController;
 use App\Models\DetallePermiso;
@@ -138,4 +139,9 @@ Route::controller(DetallePermisoMenuController::class)->group(function() {
     Route::post('detallePermisosMenu','index')->name('detalles');
     Route::post('configuracion', 'create')->name('configuracion');
     Route::post('editarconfiguracion','update')->name('editarconfiguracion');
+});
+
+Route::controller(LogsEntradaSalidaController::class)->group(function() {
+    Route::post('editarSalida','editarSalida')->name('editarSalida');
+    Route::post('editarEntrada','editarEntrada')->name('editarEntrada');
 });

@@ -59,11 +59,6 @@ class DocumentoController extends Controller
         $documento->save();
 
         return response()->json([
-            
-            // 'documento' => $documento,
-            // 'detalleDoc' => $detalleDoc,
-            // 'permiso' => $permiso,
-            // 'detallePermiso' => $detallePermiso,
             'success' => true
         ], 201);
 
@@ -183,11 +178,7 @@ class DocumentoController extends Controller
         } else {
             
         }
-
         return response()->json([
-            // 'permiso' => $permiso,
-            // 'detallePermiso' => $detallePermiso,
-            // 'detalleDocumento' => $detalleDoc,
             'success' => true
         ], 201);
     }

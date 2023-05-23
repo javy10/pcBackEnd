@@ -68,6 +68,10 @@ class DetalleArchivoDocumentoController extends Controller
         //$detalleDoc->urlArchivo = $filePath;
         $detalleDoc->disponible = $request->disponible;
         $detalleDoc->save();
+
+        return response()->json([
+            'success' => true
+        ], 201);
     }
 
     /**

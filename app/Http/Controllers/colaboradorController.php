@@ -23,10 +23,11 @@ class colaboradorController extends Controller
     public function index()
     {
          $colaborador = DB::table('users')
-                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.correo AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos')
+                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.correo AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos', 'logs_entrada_salidas.fechaSalida')
                 ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
                 ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
                 ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+                ->join('logs_entrada_salidas', 'logs_entrada_salidas.colaborador_id', '=', 'users.id')
                 ->where('users.habilitado', 'S')
                 ->get();
 
