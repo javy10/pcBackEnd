@@ -13,14 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('detalle_grupo_colaboradors', function (Blueprint $table) {
+        Schema::create('evaluaciones', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('colaborador_id');
-            $table->unsignedBigInteger('grupo_id');
+            $table->string('nombre');
+            $table->string('descripcion');
+            $table->integer('calificacionMinima');
+            $table->decimal('nota')->nullable();
+            $table->char('intentos');
             $table->char('habilitado');
             $table->timestamps();
-            $table->foreign('colaborador_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('grupo_id')->references('id')->on('grupos')->onDelete('cascade');
         });
     }
 
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('detalle_grupo_colaboradors');
+        Schema::dropIfExists('evaluaciones');
     }
 };

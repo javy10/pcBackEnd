@@ -11,8 +11,10 @@ use App\Http\Controllers\Auth;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\TipoDocumentoController;
 use App\Http\Controllers\DetalleArchivoDocumentoController;
+use App\Http\Controllers\DetalleGrupoEvaluacionController;
 use App\Http\Controllers\DetallePermisoController;
 use App\Http\Controllers\DetallePermisoMenuController;
+use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\LogsEntradaSalidaController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PermisoController;
@@ -144,4 +146,14 @@ Route::controller(DetallePermisoMenuController::class)->group(function() {
 Route::controller(LogsEntradaSalidaController::class)->group(function() {
     Route::post('editarSalida','editarSalida')->name('editarSalida');
     Route::post('editarEntrada','editarEntrada')->name('editarEntrada');
+});
+
+Route::controller(GrupoController::class)->group(function() {
+    Route::post('crearGrupo','create')->name('create');
+    
+});
+
+Route::controller(DetalleGrupoEvaluacionController::class)->group(function() {
+    Route::post('crearDetalleGrupo','create')->name('create');
+    
 });

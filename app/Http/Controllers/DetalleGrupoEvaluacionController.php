@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DetalleGrupoEvaluaciones;
+use App\Models\GrupoEvaluaciones;
 use Illuminate\Http\Request;
 
-class DetalleGrupoColaboradorController extends Controller
+class DetalleGrupoEvaluacionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,9 +23,21 @@ class DetalleGrupoColaboradorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        //$documento = new Documento();
+        $ultimoId = GrupoEvaluaciones::latest()->first()->id;
+
+        $detalleGE = new DetalleGrupoEvaluaciones();
+        $detalleGE->grupo_id = $ultimoId;
+        $detalleGE->evaluacion_id = $request->evaluacion_id == 0 ? null : $request->evaluacion_id;
+        $detalleGE->colaborador_id = $request->colaborador_id;
+        $detalleGE->habilitado = 'S';
+        $detalleGE->save();
+
+        return response()->json([
+            'success' => true
+        ], 201);
     }
 
     /**

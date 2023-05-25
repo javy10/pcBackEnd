@@ -13,15 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('grupos', function (Blueprint $table) {
+        Schema::create('detalle_grupo_evaluaciones', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('grupo_id');
             $table->unsignedBigInteger('evaluacion_id');
-            $table->string('nombre');
-            $table->dateTime('apertura');
-            $table->dateTime('cierre');
+            $table->unsignedBigInteger('colaborador_id');
             $table->char('habilitado');
             $table->timestamps();
-            $table->foreign('evaluacion_id')->references('id')->on('evaluacions')->onDelete('cascade');
+
+            $table->foreign('grupo_id')->references('id')->on('grupo_evaluaciones')->onDelete('cascade');
+            $table->foreign('evaluacion_id')->references('id')->on('evaluaciones')->onDelete('cascade');
+            $table->foreign('colaborador_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('grupos');
+        Schema::dropIfExists('detalle_grupo_evaluaciones');
     }
 };

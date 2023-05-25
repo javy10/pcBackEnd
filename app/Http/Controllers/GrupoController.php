@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GrupoEvaluaciones;
 use Illuminate\Http\Request;
 
 class GrupoController extends Controller
@@ -21,9 +22,18 @@ class GrupoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $grupo = new GrupoEvaluaciones();
+        $grupo->nombre = $request->nombre;
+        $grupo->apertura = $request->apertura;
+        $grupo->cierre = $request->cierre;
+        $grupo->habilitado = 'S';
+        $grupo->save();
+
+        return response()->json([
+            'success' => true
+        ], 201);
     }
 
     /**

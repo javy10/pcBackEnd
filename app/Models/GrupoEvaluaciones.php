@@ -5,18 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Respuesta extends Model
+class GrupoEvaluaciones extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'pregunta_id',
-        'valorRespuesta',
-        'respuestaCorrecta',
+        'nombre',
+        'cierre',
+        'apertura',
         'habilitado',
+        
     ];
-
-    public function Pregunta(){
-        return $this->belongsTo(Pregunta::class);
-    }
 }

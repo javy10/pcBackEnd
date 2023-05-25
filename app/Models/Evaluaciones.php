@@ -5,20 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Evaluacion extends Model
+class Evaluaciones extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'titulo',
+        'nombre',
         'descripcion',
         'calificacionMinima',
-        'habilitado',
         'intentos',
-        'colaborador_id',
-        'nota',
+        'Nota',
+        'habilitado',
     ];
-    public function Colaborador(){
-        return $this->belongsTo(User::class);
-    }
+
+
 }
