@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GrupoEvaluaciones;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class GrupoController extends Controller
+use App\Models\TipoPregunta;
+use Illuminate\Http\Request;
+
+class TipoPreguntaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +15,12 @@ class GrupoController extends Controller
      */
     public function index()
     {
-        //
+        $tipoPregunta = TipoPregunta::all();
+
+        return response()->json([
+            'dataDB' => $tipoPregunta,
+            'success' => true
+        ]);
     }
 
     /**
@@ -23,18 +28,9 @@ class GrupoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create()
     {
-        $grupo = new GrupoEvaluaciones();
-        $grupo->nombre = $request->nombre;
-        $grupo->apertura = $request->apertura;
-        $grupo->cierre = $request->cierre;
-        $grupo->habilitado = 'S';
-        $grupo->save();
-
-        return response()->json([
-            'success' => true
-        ], 201);
+       
     }
 
     /**
@@ -45,15 +41,7 @@ class GrupoController extends Controller
      */
     public function store(Request $request)
     {
-        $resultados = DB::table('detalle_grupo_evaluaciones')
-        ->select('colaborador_id')
-        ->where('grupo_id', '=', $request->id)
-        ->get();
-
-        return response()->json([
-            'dataDB' => $resultados,
-            'success' => true
-        ]);
+        //
     }
 
     /**
@@ -62,14 +50,9 @@ class GrupoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function show($id)
     {
-
-        $grupo = GrupoEvaluaciones::find($request->id);
-        return response()->json([
-            'dataDB' => $grupo,
-            'success' => true
-        ]);
+        //
     }
 
     /**

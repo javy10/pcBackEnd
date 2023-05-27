@@ -13,13 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('evaluaciones', function (Blueprint $table) {
+        Schema::create('tipo_preguntas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('descripcion');
-            $table->integer('calificacionMinima');
-            $table->integer('cantidadPreguntas')->nullable();
-            $table->char('intentos');
+            $table->string('tipo');
             $table->char('habilitado');
             $table->timestamps();
         });
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('evaluaciones');
+        Schema::dropIfExists('tipo_preguntas');
     }
 };

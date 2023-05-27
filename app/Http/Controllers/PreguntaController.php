@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\GrupoEvaluaciones;
+use App\Models\DetalleEvaluacionPregunta;
+use App\Models\TipoPregunta;
+use App\Models\Pregunta;
+use App\Models\Respuesta;
+use App\Models\DetallePreguntaRespuesta;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class GrupoController extends Controller
+class PreguntaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +18,7 @@ class GrupoController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -25,16 +28,40 @@ class GrupoController extends Controller
      */
     public function create(Request $request)
     {
-        $grupo = new GrupoEvaluaciones();
-        $grupo->nombre = $request->nombre;
-        $grupo->apertura = $request->apertura;
-        $grupo->cierre = $request->cierre;
-        $grupo->habilitado = 'S';
-        $grupo->save();
+
+        //return $request;
+        $pregunta = new Pregunta();
+        $pregunta->valorPregunta = $request->pregunta;
+        $pregunta->tipoPregunta_id = $request->tipoPregunta_id;
+        $pregunta->habilitado = 'S';
+        $pregunta->save();
+       
+        foreach ($request->respuestas as $resp) {
+
+            $respuestas = new Respuesta();
+            $respuestas->valorRespuesta = $resp['respuesta'];
+            $respuestas->respuestaCorrecta = $resp['seleccionado'];
+            $respuestas->habilitado = 'S';
+            $respuestas->save();
+
+            $detalle = new DetallePreguntaRespuesta();
+            $detalle->pregunta_id = $pregunta->id;
+            $detalle->respuesta_id = $respuestas->id;
+            $detalle->habilitado = 'S';
+            $detalle->save();
+        }
+
+        $detalle = new DetalleEvaluacionPregunta();
+        $detalle->pregunta_id = $pregunta->id;
+        $detalle->evaluacion_id = $request->evaluacion_id;
+        $detalle->nota = null;
+        $detalle->habilitado = 'S';
+        $detalle->save();
 
         return response()->json([
             'success' => true
         ], 201);
+
     }
 
     /**
@@ -45,15 +72,7 @@ class GrupoController extends Controller
      */
     public function store(Request $request)
     {
-        $resultados = DB::table('detalle_grupo_evaluaciones')
-        ->select('colaborador_id')
-        ->where('grupo_id', '=', $request->id)
-        ->get();
-
-        return response()->json([
-            'dataDB' => $resultados,
-            'success' => true
-        ]);
+        //
     }
 
     /**
@@ -62,14 +81,9 @@ class GrupoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function show($id)
     {
-
-        $grupo = GrupoEvaluaciones::find($request->id);
-        return response()->json([
-            'dataDB' => $grupo,
-            'success' => true
-        ]);
+        //
     }
 
     /**

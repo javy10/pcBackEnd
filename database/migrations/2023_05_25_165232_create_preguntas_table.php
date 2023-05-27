@@ -13,15 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('evaluaciones', function (Blueprint $table) {
+        Schema::create('preguntas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('descripcion');
-            $table->integer('calificacionMinima');
-            $table->integer('cantidadPreguntas')->nullable();
-            $table->char('intentos');
+            $table->string('valorPregunta');
+            $table->unsignedBigInteger('tipoPregunta_id');
             $table->char('habilitado');
             $table->timestamps();
+            $table->foreign('tipoPregunta_id')->references('id')->on('tipo_preguntas')->onDelete('cascade');
         });
     }
 
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('evaluaciones');
+        Schema::dropIfExists('preguntas');
     }
 };

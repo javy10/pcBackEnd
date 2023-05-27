@@ -11,13 +11,18 @@ use App\Http\Controllers\Auth;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\TipoDocumentoController;
 use App\Http\Controllers\DetalleArchivoDocumentoController;
+use App\Http\Controllers\DetalleEvaluacionPreguntaController;
 use App\Http\Controllers\DetalleGrupoEvaluacionController;
 use App\Http\Controllers\DetallePermisoController;
 use App\Http\Controllers\DetallePermisoMenuController;
+use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\LogsEntradaSalidaController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PermisoController;
+use App\Http\Controllers\PreguntaController;
+use App\Http\Controllers\RespuestaController;
+use App\Http\Controllers\TipoPreguntaController;
 use App\Models\DetallePermiso;
 
 /*
@@ -150,10 +155,42 @@ Route::controller(LogsEntradaSalidaController::class)->group(function() {
 
 Route::controller(GrupoController::class)->group(function() {
     Route::post('crearGrupo','create')->name('create');
-    
+    Route::get('obtenerGrupoID/{id}','show')->name('obtenerGrupoID');
+    Route::get('obtenerColaboradoresGrupoID/{id}','store')->name('obtenerColaboradoresGrupoID');
+});
+
+Route::controller(EvaluacionController::class)->group(function() {
+    Route::post('crearEvaluacion','create')->name('create');
+    Route::get('obtenerEvaluaciones','index')->name('obtenerEvaluaciones');
+    Route::get('obtenerEvaluacionID/{id}','show')->name('obtenerEvaluacionID');
+    Route::post('editarCantidadPreguntas','edit')->name('editarCantidadPreguntas');
+    Route::post('editarEvaluacion','update')->name('editarEvaluacion');
+    Route::get('eliminarEvaluacion/{id}', 'deshabilitarEvaluacion')->name('eliminarEvaluacion');
 });
 
 Route::controller(DetalleGrupoEvaluacionController::class)->group(function() {
     Route::post('crearDetalleGrupo','create')->name('create');
+    Route::post('editarEvalaucionDetalleGrupo','edit')->name('edit');
+    Route::get('obtenerGrupo','index')->name('obtenerGrupo');
     
 });
+
+Route::controller(TipoPreguntaController::class)->group(function() {
+    Route::get('obtenerTipoPregunta','index')->name('obtenerTipoPregunta');
+    
+});
+
+Route::controller(PreguntaController::class)->group(function() {
+    Route::post('crearPreguntas','create')->name('crearPreguntas');
+    
+});
+
+Route::controller(RespuestaController::class)->group(function() {
+    Route::post('crearRespuestas','create')->name('crearRespuestas');
+    
+});
+Route::controller(DetalleEvaluacionPreguntaController::class)->group(function() {
+    Route::get('conteoPreguntas/{id}','show')->name('conteoPreguntas');
+    
+});
+
