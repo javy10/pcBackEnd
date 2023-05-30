@@ -17,7 +17,7 @@ class DetallePreguntaRespuestaController extends Controller
         $resultados = DB::table('detalle_pregunta_respuestas as dpr')
                         ->join('respuestas as r', 'dpr.respuesta_id', '=', 'r.id')
                         ->join('preguntas as p', 'dpr.pregunta_id', '=', 'p.id')
-                        ->select('r.valorRespuesta', 'preguntas.tipoPregunta_id')
+                        ->select('r.valorRespuesta', 'p.tipoPregunta_id')
                         ->where('dpr.pregunta_id', '=', $request->id)
                         ->get();
 
