@@ -15,6 +15,7 @@ use App\Http\Controllers\DetalleEvaluacionPreguntaController;
 use App\Http\Controllers\DetalleGrupoEvaluacionController;
 use App\Http\Controllers\DetallePermisoController;
 use App\Http\Controllers\DetallePermisoMenuController;
+use App\Http\Controllers\DetallePreguntaRespuestaController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\LogsEntradaSalidaController;
@@ -157,6 +158,8 @@ Route::controller(GrupoController::class)->group(function() {
     Route::post('crearGrupo','create')->name('create');
     Route::get('obtenerGrupoID/{id}','show')->name('obtenerGrupoID');
     Route::get('obtenerColaboradoresGrupoID/{id}','store')->name('obtenerColaboradoresGrupoID');
+    Route::post('editarGrupo','update')->name('editarGrupo');
+    Route::get('eliminarGrupo/{id}','edit')->name('eliminarGrupo');
 });
 
 Route::controller(EvaluacionController::class)->group(function() {
@@ -172,7 +175,7 @@ Route::controller(DetalleGrupoEvaluacionController::class)->group(function() {
     Route::post('crearDetalleGrupo','create')->name('create');
     Route::post('editarEvalaucionDetalleGrupo','edit')->name('edit');
     Route::get('obtenerGrupo','index')->name('obtenerGrupo');
-    
+    Route::post('editarDetalleGrupo','update')->name('editarDetalleGrupo');
 });
 
 Route::controller(TipoPreguntaController::class)->group(function() {
@@ -189,8 +192,15 @@ Route::controller(RespuestaController::class)->group(function() {
     Route::post('crearRespuestas','create')->name('crearRespuestas');
     
 });
+
 Route::controller(DetalleEvaluacionPreguntaController::class)->group(function() {
     Route::get('conteoPreguntas/{id}','show')->name('conteoPreguntas');
+    Route::get('obtenerPreguntasQuiz/{id}','index')->name('obtenerPreguntasQuiz');
+    
+});
+
+Route::controller(DetallePreguntaRespuestaController::class)->group(function() {
+    Route::get('obtenerRespestasQuiz/{id}','index')->name('obtenerRespestasQuiz');
     
 });
 

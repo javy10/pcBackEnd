@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DetalleEvaluacionPregunta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DetalleEvaluacionPreguntaController extends Controller
 {
@@ -12,9 +13,31 @@ class DetalleEvaluacionPreguntaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // return $request->id;
+        // die;
+
+        $resultados = DB::table('preguntas as p')
+                        ->join('detalle_pregunta_respuestas as pr', 'p.id', '=', 'pr.pregunta_id')
+                        ->join('respuestas as r', 'pr.respuesta_id', '=', 'r.id')
+                        ->join('detalle_evaluacion_preguntas as dep', 'p.id', '=', 'dep.pregunta_id')
+                        ->join('evaluaciones as e', 'dep.evaluacion_id', '=', 'e.id')
+                        ->join('detalle_grupo_evaluaciones as dge', 'e.id', '=', 'dge.evaluacion_id')
+                        ->join('grupo_evaluaciones as g', 'dge.grupo_id', '=', 'g.id')
+                        ->select('p.id', 'p.valorPregunta', 'r.valorRespuesta' )
+                        ->distinct()
+                        ->where('g.habilitado', '=', 'S')
+                        ->where('e.habilitado', '=', 'S')
+                        // ->where('r.respuestaCorrecta', '=', 1)
+                        ->where('dge.colaborador_id', '=', $request->id)
+                        // ->groupBy('p.valorPregunta')
+                        ->get();
+
+        return response()->json([
+            'dataDB' => $resultados,
+            'success' => true
+        ], 201);
     }
 
     /**

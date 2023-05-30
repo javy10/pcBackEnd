@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DetallePreguntaRespuestaController extends Controller
 {
@@ -11,9 +12,19 @@ class DetallePreguntaRespuestaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $resultados = DB::table('detalle_pregunta_respuestas as dpr')
+                        ->join('respuestas as r', 'dpr.respuesta_id', '=', 'r.id')
+                        ->join('preguntas as p', 'dpr.pregunta_id', '=', 'p.id')
+                        ->select('r.valorRespuesta', 'preguntas.tipoPregunta_id')
+                        ->where('dpr.pregunta_id', '=', $request->id)
+                        ->get();
+
+        return response()->json([
+            'dataDB' => $resultados,
+            'success' => true
+        ], 201);
     }
 
     /**
