@@ -23,6 +23,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\RespuestaController;
+use App\Http\Controllers\ResultadoController;
 use App\Http\Controllers\TipoPreguntaController;
 use App\Models\DetallePermiso;
 
@@ -165,10 +166,12 @@ Route::controller(GrupoController::class)->group(function() {
 Route::controller(EvaluacionController::class)->group(function() {
     Route::post('crearEvaluacion','create')->name('create');
     Route::get('obtenerEvaluaciones','index')->name('obtenerEvaluaciones');
+    Route::get('obtenerEvaluacionesDeshabilitadas','obtenerEvaluacionesDeshabilitadas')->name('obtenerEvaluacionesDeshabilitadas');
     Route::get('obtenerEvaluacionID/{id}','show')->name('obtenerEvaluacionID');
     Route::post('editarCantidadPreguntas','edit')->name('editarCantidadPreguntas');
     Route::post('editarEvaluacion','update')->name('editarEvaluacion');
     Route::get('eliminarEvaluacion/{id}', 'deshabilitarEvaluacion')->name('eliminarEvaluacion');
+    Route::post('editarIntentosEvaluacion', 'editarIntentosEvaluacion')->name('editarIntentosEvaluacion');
 });
 
 Route::controller(DetalleGrupoEvaluacionController::class)->group(function() {
@@ -176,6 +179,8 @@ Route::controller(DetalleGrupoEvaluacionController::class)->group(function() {
     Route::post('editarEvalaucionDetalleGrupo','edit')->name('edit');
     Route::get('obtenerGrupo','index')->name('obtenerGrupo');
     Route::post('editarDetalleGrupo','update')->name('editarDetalleGrupo');
+    Route::get('habilitarEvaluacion/{id}','habilitarEvaluacion')->name('habilitarEvaluacion');
+    Route::get('obtenerDetalleGrupoEvaluacion/{id}','show')->name('obtenerDetalleGrupoEvaluacion');
 });
 
 Route::controller(TipoPreguntaController::class)->group(function() {
@@ -201,6 +206,10 @@ Route::controller(DetalleEvaluacionPreguntaController::class)->group(function() 
 
 Route::controller(DetallePreguntaRespuestaController::class)->group(function() {
     Route::get('obtenerRespestasQuiz/{id}','index')->name('obtenerRespestasQuiz');
-    
+    Route::post('obtenerRespuestaCorrecta','show')->name('obtenerRespuestaCorrecta');
 });
 
+Route::controller(ResultadoController::class)->group(function() {
+    Route::post('guardarResultadoPreguntas','create')->name('guardarResultadoPreguntas');
+    
+});

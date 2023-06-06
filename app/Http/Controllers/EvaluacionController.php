@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Evaluaciones;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EvaluacionController extends Controller
 {
@@ -14,11 +15,26 @@ class EvaluacionController extends Controller
      */
     public function index()
     {
-        $evaluaciones = Evaluaciones::select('grupo_evaluaciones.nombre as grupo', 'evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'evaluaciones.created_at')
+        $evaluaciones = Evaluaciones::select('grupo_evaluaciones.nombre as grupo', 'evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'evaluaciones.intentos', 'evaluaciones.created_at')
             ->distinct()
             ->join('detalle_grupo_evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
             ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
             ->where('evaluaciones.habilitado', '=', 'S')
+            ->get();
+
+        return response()->json([
+            'dataDB' => $evaluaciones,
+            'success' => true
+        ], 201);
+    }
+
+    public function obtenerEvaluacionesDeshabilitadas()
+    {
+        $evaluaciones = Evaluaciones::select('grupo_evaluaciones.nombre as grupo', 'evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'evaluaciones.intentos', 'evaluaciones.created_at')
+            ->distinct()
+            ->join('detalle_grupo_evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
+            ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
+            ->where('evaluaciones.habilitado', '=', 'N')
             ->get();
 
         return response()->json([
@@ -132,6 +148,22 @@ class EvaluacionController extends Controller
         $evaluacion = Evaluaciones::findOrFail($request->id)->update([
             'habilitado' => 'N'
         ]);
+        return response()->json([
+            'dataDB' => $evaluacion,
+            'success' => true
+        ]);
+    }
+
+    public function editarIntentosEvaluacion(Request $request)
+    {
+
+        
+        $evaluacion = DB::table('detalle_grupo_evaluaciones')
+                ->where('detalle_grupo_evaluaciones.evaluacion_id', $request->evaluacion_id)
+                ->where('detalle_grupo_evaluaciones.colaborador_id', $request->colaborador_id)
+                ->decrement('intentos',1);
+                //->update(['intentos' => 0]);
+
         return response()->json([
             'dataDB' => $evaluacion,
             'success' => true

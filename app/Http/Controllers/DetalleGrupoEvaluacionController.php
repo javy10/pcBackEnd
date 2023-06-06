@@ -79,7 +79,19 @@ class DetalleGrupoEvaluacionController extends Controller
      */
     public function show($id)
     {
-        //
+        $resultados = DetalleGrupoEvaluaciones::join('evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
+                    ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
+                    ->where('evaluaciones.habilitado', '=', 'S')
+                    ->where('grupo_evaluaciones.habilitado', '=', 'S')
+                    ->where('evaluaciones.intentos', '>', 0)
+                    ->where('detalle_grupo_evaluaciones.colaborador_id', '=', $id)
+                    ->select('detalle_grupo_evaluaciones.colaborador_id', 'grupo_evaluaciones.apertura', 'grupo_evaluaciones.cierre', 'evaluaciones.intentos')
+                    ->get();
+
+        return response()->json([
+            'dataDB' => $resultados,
+            'success' => true
+        ], 201);
     }
 
     /**
@@ -93,13 +105,25 @@ class DetalleGrupoEvaluacionController extends Controller
         if($request->grupo_id) {
             $ultimoId = Evaluaciones::latest()->first()->id;
             $evaluacion = DetalleGrupoEvaluaciones::where('grupo_id', $request->grupo_id)->update([
-                'evaluacion_id' => $ultimoId
+                'evaluacion_id' => $ultimoId,
+                'intentos' => $request->intentos
             ]);
             return response()->json([
                 'evaluacion' => $evaluacion,
                 'success' => true
             ]);
         }
+    }
+
+    public function habilitarEvaluacion(Request $request)
+    {
+        $evaluacion = Evaluaciones::findOrFail($request->id)->update([
+            'habilitado' => 'S'
+        ]);
+        return response()->json([
+            'dataDB' => $evaluacion,
+            'success' => true
+        ]);
     }
 
     /**

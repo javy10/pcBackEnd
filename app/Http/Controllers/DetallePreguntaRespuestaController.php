@@ -17,7 +17,8 @@ class DetallePreguntaRespuestaController extends Controller
         $resultados = DB::table('detalle_pregunta_respuestas as dpr')
                         ->join('respuestas as r', 'dpr.respuesta_id', '=', 'r.id')
                         ->join('preguntas as p', 'dpr.pregunta_id', '=', 'p.id')
-                        ->select('r.valorRespuesta', 'p.tipoPregunta_id')
+                        ->select('r.id as respuesta_id', 'r.valorRespuesta', 'p.id as pregunta_id', 'p.tipoPregunta_id', 'r.respuestaCorrecta')
+                        ->where('r.respuestaCorrecta', '=', 1)
                         ->where('dpr.pregunta_id', '=', $request->id)
                         ->get();
 
@@ -54,9 +55,20 @@ class DetallePreguntaRespuestaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-        //
+        $respuestaCorrecta = DB::table('detalle_pregunta_respuestas')
+                            ->join('preguntas', 'detalle_pregunta_respuestas.pregunta_id', '=', 'preguntas.id')
+                            ->join('respuestas', 'detalle_pregunta_respuestas.respuesta_id', '=', 'respuestas.id')
+                            ->select('respuestas.id')
+                            ->where('preguntas.id', '=', $request->pregunta_id)
+                            ->where('respuestas.respuestaCorrecta', '=', 1)
+                            ->get();
+        return response()->json([
+            'dataDB' => $respuestaCorrecta,
+            'success' => true
+        ], 201);
+
     }
 
     /**

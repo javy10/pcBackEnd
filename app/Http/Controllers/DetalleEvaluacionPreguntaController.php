@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DetalleEvaluacionPregunta;
+use App\Models\Evaluaciones;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,7 +26,7 @@ class DetalleEvaluacionPreguntaController extends Controller
                         ->join('evaluaciones as e', 'dep.evaluacion_id', '=', 'e.id')
                         ->join('detalle_grupo_evaluaciones as dge', 'e.id', '=', 'dge.evaluacion_id')
                         ->join('grupo_evaluaciones as g', 'dge.grupo_id', '=', 'g.id')
-                        ->select('p.id', 'p.valorPregunta', 'r.id as respuesta_id', 'r.valorRespuesta', 'p.tipoPregunta_id' )
+                        ->select('p.id', 'p.valorPregunta', 'r.id as respuesta_id', 'r.valorRespuesta', 'p.tipoPregunta_id', 'e.id as evaluacion_id' )
                         ->distinct()
                         ->where('g.habilitado', '=', 'S')
                         ->where('e.habilitado', '=', 'S')
@@ -71,6 +72,10 @@ class DetalleEvaluacionPreguntaController extends Controller
     {
         $conteo = DetalleEvaluacionPregunta::where('evaluacion_id', '=', $id)
             ->count('pregunta_id');
+
+        $grupo = Evaluaciones::findOrFail($id)->update([
+            'cantidadPreguntas' => $conteo
+        ]);
 
         return response()->json([
             'conteo' => $conteo,
