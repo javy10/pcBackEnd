@@ -50,7 +50,8 @@ Route::controller(AuthController::class)->group(function() {
     Route::post('login','login')->name('login');
     Route::get('user','user')->name('user');
     Route::post('logout','logout')->name('logout');
-    Route::post('/forgot-password','sendResetLinkEmail')->name('sendResetLinkEmail');
+    // Route::post('/forgot-password','sendResetLinkEmail')->name('sendResetLinkEmail');
+    
 });
 //Route::post('reset-password', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 //Route::post('/forgot-password','Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
@@ -75,6 +76,7 @@ Route::controller(colaboradorController::class)->group(function() {
     Route::post('editPassword','editPassword')->name('editPassword');
     Route::get('fotoURL/{nombre}', 'obtenerFoto')->name('fotoUrl');
     //Route::post('login','singIn')->name('login');
+    Route::post('recover-password','recover')->name('recover-password');
 });
 
 Route::controller(agenciaController::class)->group(function() {
@@ -181,6 +183,9 @@ Route::controller(DetalleGrupoEvaluacionController::class)->group(function() {
     Route::post('editarDetalleGrupo','update')->name('editarDetalleGrupo');
     Route::get('habilitarEvaluacion/{id}','habilitarEvaluacion')->name('habilitarEvaluacion');
     Route::get('obtenerDetalleGrupoEvaluacion/{id}','show')->name('obtenerDetalleGrupoEvaluacion');
+    Route::get('intentosColaboradores','intentosColaboradores')->name('intentosColaboradores');
+    Route::get('habilitarIntentosEvaluacion/{id}','habilitarIntentosEvaluacion')->name('habilitarIntentosEvaluacion');
+    Route::post('obtenerResultadosEvaluacion', 'obtenerResultadosEvaluacion')->name('obtenerResultadosEvaluacion');
 });
 
 Route::controller(TipoPreguntaController::class)->group(function() {
@@ -200,7 +205,7 @@ Route::controller(RespuestaController::class)->group(function() {
 
 Route::controller(DetalleEvaluacionPreguntaController::class)->group(function() {
     Route::get('conteoPreguntas/{id}','show')->name('conteoPreguntas');
-    Route::get('obtenerPreguntasQuiz/{id}','index')->name('obtenerPreguntasQuiz');
+    Route::post('obtenerPreguntasQuiz','index')->name('obtenerPreguntasQuiz');
     
 });
 

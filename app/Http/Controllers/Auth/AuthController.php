@@ -109,17 +109,22 @@ class AuthController extends Controller
     {
         $this->validateEmail($request);
 
-        return $request;
-        die;
+        // return $request;
+        // die;
 
         $response = $this->broker()->sendResetLink(
-            $request->only('email')
+            $request->only('correo')
         );
 
         return $response == Password::RESET_LINK_SENT
                     ? response()->json(['message' => 'Reset password email sent'], 200)
                     : response()->json(['error' => 'Unable to send reset password email'], 500);
     }
+
+    
+
+
+
 
 
 }

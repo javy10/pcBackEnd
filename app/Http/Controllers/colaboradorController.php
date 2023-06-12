@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Password;
 
 class colaboradorController extends Controller
 {
@@ -23,7 +24,7 @@ class colaboradorController extends Controller
     public function index()
     {
          $colaborador = DB::table('users')
-                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.correo AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos', 'logs_entrada_salidas.fechaSalida')
+                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.email AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos', 'logs_entrada_salidas.fechaSalida')
                 ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
                 ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
                 ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
@@ -40,7 +41,7 @@ class colaboradorController extends Controller
     public function Deshabilitados()
     {
          $colaborador = DB::table('users')
-                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.correo AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos')
+                ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.email AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos')
                 ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
                 ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
                 ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
@@ -73,7 +74,7 @@ class colaboradorController extends Controller
          $user = User::create([
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
-            'correo' => $request->correo,
+            'email' => $request->correo,
             'password' => Hash::make($request->password),
             'agencia_id' => $request->agencia_id,
             'departamento_id' => $request->departamento_id,
@@ -153,6 +154,7 @@ class colaboradorController extends Controller
         $colab = DB::table('users')
                 ->select('users.password AS clave', 'users.intentos AS intentos', 'users.id AS id')
                 ->where('users.dui', $request->dui)
+                ->where('users.habilitado', '=', 'S')
                 ->get();
         return response()->json([
             'dataDB' => $colab,
@@ -254,26 +256,46 @@ class colaboradorController extends Controller
 
         //return $request;
         $file = $request->file('foto');
-        $fileName = $file->getClientOriginalName();
-        $filePath = public_path($fileName);
-        $path = $file->storeAs('public/imagenes', $fileName);
+        if($file != null || $file != '') 
+        {
+            $fileName = $file->getClientOriginalName();
+            $filePath = public_path($fileName);
+            $path = $file->storeAs('public/imagenes', $fileName);
 
-        $user = User::find($request->id);
-        $user->update([
-            'foto' => $fileName,
-            'dui' => $request->dui,
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'agencia_id' => $request->agencia_id,
-            'departamento_id' => $request->departamento_id,
-            'cargo_id' => $request->cargo_id,
-            'telefono' => $request->telefono,
-            'correo' => $request->correo,
-        ]);
-        return response()->json([
-            'dataDB' => $user,
-            'success' => true
-        ]);
+            $user = User::find($request->id);
+            $user->update([
+                'foto' => $fileName,
+                'dui' => $request->dui,
+                'nombres' => $request->nombres,
+                'apellidos' => $request->apellidos,
+                'agencia_id' => $request->agencia_id,
+                'departamento_id' => $request->departamento_id,
+                'cargo_id' => $request->cargo_id,
+                'telefono' => $request->telefono,
+                'email' => $request->correo,
+            ]);
+            return response()->json([
+                'dataDB' => $user,
+                'success' => true
+            ]);
+        } else {
+            $user = User::find($request->id);
+            $user->update([
+                'dui' => $request->dui,
+                'nombres' => $request->nombres,
+                'apellidos' => $request->apellidos,
+                'agencia_id' => $request->agencia_id,
+                'departamento_id' => $request->departamento_id,
+                'cargo_id' => $request->cargo_id,
+                'telefono' => $request->telefono,
+                'email' => $request->correo,
+            ]);
+            return response()->json([
+                'dataDB' => $user,
+                'success' => true
+            ]);
+        }
+
     }
 
     /**
@@ -282,8 +304,36 @@ class colaboradorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function destroy($id)
     {
         //
     }
+
+
+    public function recover(Request $request)
+    {
+
+        //return $request->email;
+
+        //$request->validate(['correo' => 'required|email']);
+
+        $response = Password::sendResetLink(['email' => $request->input('email')]);
+
+        // return $response;
+        // die;
+
+        if ($response == Password::RESET_LINK_SENT) {
+            return response()->json([
+                'message' => 'Correo electrónico de recuperación enviado',
+                'success' => true
+            ],
+            200);
+        } else {
+            return response()->json(['error' => 'No se pudo enviar el correo electrónico de recuperación'], 400);
+        }
+    }
+
+
+
 }

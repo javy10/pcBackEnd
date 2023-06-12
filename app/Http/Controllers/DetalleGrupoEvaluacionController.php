@@ -47,11 +47,13 @@ class DetalleGrupoEvaluacionController extends Controller
     {
         //$documento = new Documento();
         $ultimoId = GrupoEvaluaciones::latest()->first()->id;
+        $ultimoIdE = Evaluaciones::latest()->first()->id;
 
         $detalleGE = new DetalleGrupoEvaluaciones();
         $detalleGE->grupo_id = $ultimoId;
-        $detalleGE->evaluacion_id = $request->evaluacion_id == 0 ? null : $request->evaluacion_id;
+        $detalleGE->evaluacion_id = $ultimoIdE; //$request->evaluacion_id == 0 ? null : $request->evaluacion_id;
         $detalleGE->colaborador_id = $request->colaborador_id;
+        $detalleGE->intentos = $request->intentos;
         $detalleGE->habilitado = 'S';
         $detalleGE->save();
 
@@ -82,10 +84,11 @@ class DetalleGrupoEvaluacionController extends Controller
         $resultados = DetalleGrupoEvaluaciones::join('evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
                     ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
                     ->where('evaluaciones.habilitado', '=', 'S')
+                    ->where('evaluaciones.cantidadPreguntas', '>', 0)
                     ->where('grupo_evaluaciones.habilitado', '=', 'S')
-                    ->where('evaluaciones.intentos', '>', 0)
+                    ->where('detalle_grupo_evaluaciones.intentos', '>', 0)
                     ->where('detalle_grupo_evaluaciones.colaborador_id', '=', $id)
-                    ->select('detalle_grupo_evaluaciones.colaborador_id', 'grupo_evaluaciones.apertura', 'grupo_evaluaciones.cierre', 'evaluaciones.intentos')
+                    ->select('detalle_grupo_evaluaciones.colaborador_id', 'grupo_evaluaciones.apertura', 'grupo_evaluaciones.cierre', 'detalle_grupo_evaluaciones.intentos', 'evaluaciones.cantidadPreguntas')
                     ->get();
 
         return response()->json([
@@ -105,7 +108,7 @@ class DetalleGrupoEvaluacionController extends Controller
         if($request->grupo_id) {
             $ultimoId = Evaluaciones::latest()->first()->id;
             $evaluacion = DetalleGrupoEvaluaciones::where('grupo_id', $request->grupo_id)->update([
-                'evaluacion_id' => $ultimoId,
+                // 'evaluacion_id' => $ultimoId,
                 'intentos' => $request->intentos
             ]);
             return response()->json([
@@ -115,11 +118,57 @@ class DetalleGrupoEvaluacionController extends Controller
         }
     }
 
+    public function obtenerResultadosEvaluacion(Request $request)
+    {
+        $resultados = DB::table('detalle_grupo_evaluaciones')
+                    ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
+                    ->join('users', 'detalle_grupo_evaluaciones.colaborador_id', '=', 'users.id')
+                    ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+                    ->join('evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
+                    ->leftJoin('resultados', 'resultados.colaborador_id', '=', 'users.id')
+                    ->select('evaluaciones.nombre as Evaluacion', 'agencias.nombre as Agencia', DB::raw("CONCAT(users.nombres, ' ', users.apellidos) AS Colaborador"), 'resultados.resultado as Nota', 'evaluaciones.calificacionMinima as NotaMinima')
+                    ->where('grupo_evaluaciones.apertura', '>=', $request->apertura)
+                    ->where('grupo_evaluaciones.cierre', '<=', $request->cierre)
+                    ->get();
+        return response()->json([
+            'dataDB' => $resultados,
+            'success' => true
+        ]);
+}
+
+    public function intentosColaboradores()
+    {
+        $resultado = DB::table('detalle_grupo_evaluaciones')
+                        ->join('users', 'detalle_grupo_evaluaciones.colaborador_id', '=', 'users.id')
+                        ->join('evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
+                        ->select(DB::raw("CONCAT(users.nombres,' ', users.apellidos) as nombreCompleto, evaluaciones.nombre, detalle_grupo_evaluaciones.id, detalle_grupo_evaluaciones.intentos"))
+                        ->where('evaluaciones.habilitado', '=', 'S')
+                        ->where('detalle_grupo_evaluaciones.intentos', '=', 0)
+                        ->get();
+
+        return response()->json([
+            'dataDB' => $resultado,
+            'success' => true
+        ]);
+    }
+
     public function habilitarEvaluacion(Request $request)
     {
         $evaluacion = Evaluaciones::findOrFail($request->id)->update([
             'habilitado' => 'S'
         ]);
+        return response()->json([
+            'dataDB' => $evaluacion,
+            'success' => true
+        ]);
+    }
+
+    public function habilitarIntentosEvaluacion(Request $request)
+    {
+        $evaluacion = DetalleGrupoEvaluaciones::where('id', $request->id)
+                                    ->update([
+                                        'intentos' => 2
+                                    ]);
         return response()->json([
             'dataDB' => $evaluacion,
             'success' => true

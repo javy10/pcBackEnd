@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DetalleGrupoEvaluaciones;
 use App\Models\Evaluaciones;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class EvaluacionController extends Controller
      */
     public function index()
     {
-        $evaluaciones = Evaluaciones::select('grupo_evaluaciones.nombre as grupo', 'evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'evaluaciones.intentos', 'evaluaciones.created_at')
+        $evaluaciones = Evaluaciones::select('grupo_evaluaciones.nombre as grupo', 'detalle_grupo_evaluaciones.colaborador_id as colaborador_id', 'evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'detalle_grupo_evaluaciones.intentos', 'evaluaciones.created_at')
             ->distinct()
             ->join('detalle_grupo_evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
             ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
@@ -51,7 +52,7 @@ class EvaluacionController extends Controller
     public function create(Request $request)
     {
         $evaluacion = new Evaluaciones();
-        $evaluacion->nombre = $request->nombre;
+        $evaluacion->nombre = $request->nombreE;
         $evaluacion->descripcion = $request->descripcion;
         $evaluacion->calificacionMinima = $request->calificacionMinima;
         $evaluacion->intentos = $request->intentos;
@@ -158,12 +159,19 @@ class EvaluacionController extends Controller
     {
 
         
-        $evaluacion = DB::table('detalle_grupo_evaluaciones')
-                ->where('detalle_grupo_evaluaciones.evaluacion_id', $request->evaluacion_id)
-                ->where('detalle_grupo_evaluaciones.colaborador_id', $request->colaborador_id)
-                ->decrement('intentos',1);
-                //->update(['intentos' => 0]);
+        // $evaluacion = DB::table('detalle_grupo_evaluaciones')
+        //         ->where('detalle_grupo_evaluaciones.evaluacion_id', $request->evaluacion_id)
+        //         ->where('detalle_grupo_evaluaciones.colaborador_id', $request->colaborador_id)
+        //         ->decrement('intentos');
+                
+        $evaluacion = DetalleGrupoEvaluaciones::where('colaborador_id', $request->colaborador_id)
+                                                ->where('evaluacion_id', $request->evaluacion_id)
+                                                ->firstOrFail();
 
+        // Decrementar el valor del campo "intentos" en 1
+        $evaluacion->intentos--;
+        // Guardar los cambios en la tabla
+        $evaluacion->save();
         return response()->json([
             'dataDB' => $evaluacion,
             'success' => true
@@ -180,4 +188,7 @@ class EvaluacionController extends Controller
     {
         //
     }
+
+
+
 }

@@ -26,12 +26,13 @@ class DetalleEvaluacionPreguntaController extends Controller
                         ->join('evaluaciones as e', 'dep.evaluacion_id', '=', 'e.id')
                         ->join('detalle_grupo_evaluaciones as dge', 'e.id', '=', 'dge.evaluacion_id')
                         ->join('grupo_evaluaciones as g', 'dge.grupo_id', '=', 'g.id')
-                        ->select('p.id', 'p.valorPregunta', 'r.id as respuesta_id', 'r.valorRespuesta', 'p.tipoPregunta_id', 'e.id as evaluacion_id' )
+                        ->select('p.id', 'p.valorPregunta', 'r.id as respuesta_id', 'r.valorRespuesta', 'p.tipoPregunta_id', 'e.id as evaluacion_id', 'e.nombre' )
                         ->distinct()
                         ->where('g.habilitado', '=', 'S')
                         ->where('e.habilitado', '=', 'S')
                         // ->where('r.respuestaCorrecta', '=', 1)
-                        ->where('dge.colaborador_id', '=', $request->id)
+                        ->where('dge.colaborador_id', '=', $request->colaborador_id)
+                        ->where('e.id', '=', $request->evaluacion_id)
                         // ->groupBy('p.valorPregunta')
                         ->get();
 
