@@ -47,7 +47,7 @@ class TipoDocumentoController extends Controller
             })
 
             ->where('tipo_documentos.habilitado','=','S')
-            ->where('detalle_archivo_documentos.disponible','=','0')
+            ->where('detalle_archivo_documentos.disponible','=','S')
             ->get();
         return response()->json([
             'dataDB' => $documentos,

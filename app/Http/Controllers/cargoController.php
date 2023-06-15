@@ -25,9 +25,18 @@ class cargoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $cargo = new cargo();
+        $cargo->nombre = $request->nombre;
+        $cargo->departamento_id = $request->departamento_id;
+        $cargo->habilitado = 'S';
+        $cargo->created_at = $request->fechaRegistro;
+        $cargo->save();
+
+        return response()->json([
+            'success' => true
+        ], 201);
     }
 
     /**

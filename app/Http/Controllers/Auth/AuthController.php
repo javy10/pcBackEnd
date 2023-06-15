@@ -113,7 +113,7 @@ class AuthController extends Controller
         // die;
 
         $response = $this->broker()->sendResetLink(
-            $request->only('correo')
+            $request->only('email')
         );
 
         return $response == Password::RESET_LINK_SENT

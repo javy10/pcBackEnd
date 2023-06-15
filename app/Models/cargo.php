@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class cargo extends Model
 {
     use HasFactory;
-    // protected $fillable = [
-    //     'nombre',
-    //     'habilitado',
-    // ];
+
+    protected $fillable = [
+        'nombre',
+        'departamento_id',
+        'habilitado',
+        'created_at'
+    ];
 
     public function cargoDepartamento()
     {

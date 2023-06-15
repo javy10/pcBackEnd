@@ -28,7 +28,7 @@ class colaboradorController extends Controller
                 ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
                 ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
                 ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
-                ->join('logs_entrada_salidas', 'logs_entrada_salidas.colaborador_id', '=', 'users.id')
+                ->leftJoin('logs_entrada_salidas', 'logs_entrada_salidas.colaborador_id', '=', 'users.id')
                 ->where('users.habilitado', 'S')
                 ->get();
 
@@ -65,32 +65,88 @@ class colaboradorController extends Controller
         // echo $request->foto;
         // echo gettype($request->foto);
 
+        // $file = $request->file('foto');
+        // $fileName = $file->getClientOriginalName();
+        // $filePath = public_path($fileName);
+        // $path = $file->storeAs('public/imagenes', $fileName);
 
+        //  $user = User::create([
+        //     'nombres' => $request->nombres,
+        //     'apellidos' => $request->apellidos,
+        //     'email' => $request->correo,
+        //     'password' => Hash::make($request->password),
+        //     'agencia_id' => $request->agencia_id,
+        //     'departamento_id' => $request->departamento_id,
+        //     'cargo_id' => $request->cargo_id,
+        //     'dui' => $request->dui,
+        //     'telefono' => $request->telefono,
+        //     'intentos' => $request->intentos,
+        //     'habilitado' => $request->habilitado,
+        //     'foto' => $fileName,
+        // ]);
+        // $token = JWTAuth::fromUser($user);
+        //  return response()->json([
+        //      'user' => $user,
+        //      'token' => $token,
+        //      'success' => true
+        //  ], 201);
+
+
+
+         //return $request;
         $file = $request->file('foto');
-        $fileName = $file->getClientOriginalName();
-        $filePath = public_path($fileName);
-        $path = $file->storeAs('public/imagenes', $fileName);
+        if($file != null || $file != '') 
+        {
+            $fileName = $file->getClientOriginalName();
+            $filePath = public_path($fileName);
+            $path = $file->storeAs('public/imagenes', $fileName);
 
-         $user = User::create([
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'email' => $request->correo,
-            'password' => Hash::make($request->password),
-            'agencia_id' => $request->agencia_id,
-            'departamento_id' => $request->departamento_id,
-            'cargo_id' => $request->cargo_id,
-            'dui' => $request->dui,
-            'telefono' => $request->telefono,
-            'intentos' => $request->intentos,
-            'habilitado' => $request->habilitado,
-            'foto' => $fileName,
-        ]);
-        $token = JWTAuth::fromUser($user);
-         return response()->json([
-             'user' => $user,
-             'token' => $token,
-             'success' => true
-         ], 201);
+            $user = User::create([
+                'nombres' => $request->nombres,
+                'apellidos' => $request->apellidos,
+                'email' => $request->correo,
+                'password' => Hash::make($request->password),
+                'agencia_id' => $request->agencia_id,
+                'departamento_id' => $request->departamento_id,
+                'cargo_id' => $request->cargo_id,
+                'dui' => $request->dui,
+                'telefono' => $request->telefono == '' ? null : $request->telefono,
+                'intentos' => $request->intentos,
+                'habilitado' => $request->habilitado,
+                'foto' => $fileName,
+            ]);
+            $token = JWTAuth::fromUser($user);
+            return response()->json([
+                'user' => $user,
+                'token' => $token,
+                'success' => true
+            ], 201);
+        } else {
+            $user = User::create([
+                'nombres' => $request->nombres,
+                'apellidos' => $request->apellidos,
+                'email' => $request->correo,
+                'password' => Hash::make($request->password),
+                'agencia_id' => $request->agencia_id,
+                'departamento_id' => $request->departamento_id,
+                'cargo_id' => $request->cargo_id,
+                'dui' => $request->dui,
+                'telefono' => $request->telefono == '' ? null : $request->telefono,
+                'intentos' => $request->intentos,
+                'habilitado' => $request->habilitado,
+                'foto' => '',
+            ]);
+            $token = JWTAuth::fromUser($user);
+            return response()->json([
+                'user' => $user,
+                'token' => $token,
+                'success' => true
+            ], 201);
+        }
+
+
+
+
     }
 
     public function obtenerFoto(Request $request)
@@ -236,13 +292,31 @@ class colaboradorController extends Controller
 
     public function editPassword(Request $request)
     {
-        $colaborador = User::findOrFail($request->id)
-                    ->update(['password' => Hash::make($request->clave)]);
+        
+        // return $request;
+        // die;
+
+        $colaborador = User::findOrFail($request->colaborador_id)->update(['password' => Hash::make($request->clave)]);
         return response()->json([
             'dataDB' => $colaborador,
             'success' => true
         ]);
     }
+
+    public function obtenerUsersPorEmail(Request $request)
+    {
+        $resultado = DB::table('users')
+                        ->select('id', DB::raw('COUNT(*) as total_usuarios'))
+                        ->where('email', '=', $request->email)
+                        ->get();
+
+        return response()->json([
+            'dataDB' => $resultado,
+            'success' => true
+        ]);
+    }
+
+
 
     /**
      * Update the specified resource in storage.
@@ -315,7 +389,7 @@ class colaboradorController extends Controller
     {
 
         //return $request->email;
-
+        
         //$request->validate(['correo' => 'required|email']);
 
         $response = Password::sendResetLink(['email' => $request->input('email')]);
@@ -333,6 +407,8 @@ class colaboradorController extends Controller
             return response()->json(['error' => 'No se pudo enviar el correo electrónico de recuperación'], 400);
         }
     }
+
+
 
 
 

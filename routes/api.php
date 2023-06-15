@@ -77,6 +77,8 @@ Route::controller(colaboradorController::class)->group(function() {
     Route::get('fotoURL/{nombre}', 'obtenerFoto')->name('fotoUrl');
     //Route::post('login','singIn')->name('login');
     Route::post('recover-password','recover')->name('recover-password');
+    Route::get('obtenerUsersPorEmail/{email}','obtenerUsersPorEmail')->name('obtenerUsersPorEmail');
+    
 });
 
 Route::controller(agenciaController::class)->group(function() {
@@ -93,6 +95,7 @@ Route::controller(cargoController::class)->group(function() {
     Route::get('cargos','index')->name('cargos');
     Route::get('cargos/{id}','show')->name('cargosId');
     Route::get('cargo/{id}','buscar')->name('cargoId');
+    Route::post('guardarCargo','create')->name('guardarCargo');
 });
 
 Route::controller(TipoDocumentoController::class)->group(function() {
