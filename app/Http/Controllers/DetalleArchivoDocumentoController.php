@@ -177,8 +177,8 @@ class DetalleArchivoDocumentoController extends Controller
             ->where('detalle_permisos.colaborador_id', '=', $request->idC)
             ->orWhere('detalle_permisos.departamento_id', '=', $request->idD)
 
-            ->where('detalle_archivo_documentos.disponible','=','0')
-            ->where('detalle_archivo_documentos.lectura','=','0')
+            ->where('detalle_archivo_documentos.disponible','=','S')
+            ->where('detalle_archivo_documentos.lectura','=','S')
             ->where('detalle_archivo_documentos.habilitado','=','S')
             ->get();
         return response()->json([

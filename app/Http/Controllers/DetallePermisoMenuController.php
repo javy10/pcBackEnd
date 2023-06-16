@@ -36,13 +36,32 @@ class DetallePermisoMenuController extends Controller
             ->where('detalle_permiso_menus.habilitado','=','S')
             ->where('detalle_permiso_menus.colaborador_id', '=', $request->id)
             ->orwhere('detalle_permiso_menus.departamento_id', '=', $request->idDepart)
+            // ->where('detalle_permiso_menus.menu_id', '=', $request->menu_id)
             ->get();
         return $detallePermiso;
 
+    }
 
+    public function detallePermisosMenuConfiguracion(Request $request)
+    {
 
+        $detallePermiso = DB::table('detalle_permiso_menus')
+            ->join('menus', 'detalle_permiso_menus.menu_id', '=', 'menus.id')
+            ->leftJoin('departamentos','detalle_permiso_menus.departamento_id','=','departamentos.id')
+            ->leftJoin('cargos','detalle_permiso_menus.cargo_id','=','cargos.id')
+            ->join('permiso_menus','detalle_permiso_menus.permisoMenu_id','=','permiso_menus.id')
+            ->leftJoin('users','detalle_permiso_menus.colaborador_id','=','users.id')
+            ->select('detalle_permiso_menus.id as idConfig', 'detalle_permiso_menus.colaborador_id','users.nombres','users.apellidos','detalle_permiso_menus.cargo_id', 'cargos.nombre','detalle_permiso_menus.menu_id', 'menus.nombre as menu', 'detalle_permiso_menus.permisoMenu_id', 'detalle_permiso_menus.habilitado', 'detalle_permiso_menus.departamento_id', 'detalle_permiso_menus.created_at as fechaRegistro')
+            ->where('detalle_permiso_menus.habilitado','=','S')
+            ->where('detalle_permiso_menus.colaborador_id', '=', $request->id)
+            ->orwhere('detalle_permiso_menus.departamento_id', '=', $request->idDepart)
+            ->where('detalle_permiso_menus.menu_id', '=', $request->menu_id)
+            ->get();
+        return $detallePermiso;
 
     }
+
+
     public function obtenerDetalle()
     {
 

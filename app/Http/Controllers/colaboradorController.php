@@ -205,6 +205,26 @@ class colaboradorController extends Controller
         ]);
     }
 
+    public function buscarPorClave(Request $request)
+    {
+
+        // Obtener el usuario por correo electrónico
+        $user = User::where('id', $request->colaborador_id)->first();
+
+        // Verificar si la contraseña ingresada coincide con el hash almacenado en la base de datos
+        if ($user && Hash::check($request->clave, $user->password)) {
+            return response()->json([
+                'dataDB' => $user,
+                'success' => true
+            ]);
+        } else {
+            return response()->json([
+                'dataDB' => $user,
+                'success' => false
+            ]);
+        }
+    }
+
     public function buscar(Request $request)
     {
         $colab = DB::table('users')
@@ -217,6 +237,7 @@ class colaboradorController extends Controller
             'success' => true
         ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.

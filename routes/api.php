@@ -78,6 +78,7 @@ Route::controller(colaboradorController::class)->group(function() {
     //Route::post('login','singIn')->name('login');
     Route::post('recover-password','recover')->name('recover-password');
     Route::get('obtenerUsersPorEmail/{email}','obtenerUsersPorEmail')->name('obtenerUsersPorEmail');
+    Route::post('buscarPorClave','buscarPorClave')->name('buscarPorClave');
     
 });
 
@@ -151,6 +152,7 @@ Route::controller(MenuController::class)->group(function() {
 Route::controller(DetallePermisoMenuController::class)->group(function() {
     Route::get('obtenerDetalle', 'obtenerDetalle')->name('obtenerDetalle');
     Route::post('detallePermisosMenu','index')->name('detalles');
+    Route::post('detallePermisosMenuConfiguracion','detallePermisosMenuConfiguracion')->name('detallePermisosMenuConfiguracion');
     Route::post('configuracion', 'create')->name('configuracion');
     Route::post('editarconfiguracion','update')->name('editarconfiguracion');
 });
@@ -209,6 +211,7 @@ Route::controller(RespuestaController::class)->group(function() {
 Route::controller(DetalleEvaluacionPreguntaController::class)->group(function() {
     Route::get('conteoPreguntas/{id}','show')->name('conteoPreguntas');
     Route::post('obtenerPreguntasQuiz','index')->name('obtenerPreguntasQuiz');
+    Route::get('obtenerPreguntasRespuestas/{id}','store')->name('obtenerPreguntasRespuestas');
     
 });
 

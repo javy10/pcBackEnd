@@ -66,38 +66,38 @@ class DocumentoController extends Controller
 
     public function crearPermiso(Request $request) 
     {
-        // $permiso = new Permiso();
-        // $permiso->tipoPermiso_id = $request->tipoPermiso_id;
-        // $permiso->habilitado = 'S';
-        // $permiso->save();
-
-        // $detallePermiso = new DetallePermiso();
-        // $detallePermiso->documento_id = $request->documento_id;
-        // $detallePermiso->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
-        // $detallePermiso->colaborador_id = $request->colaborador_id == 0 ? null : $request->colaborador_id;
-        // $detallePermiso->permiso_id = $permiso->id;
-        // $detallePermiso->habilitado = 'S';
-        // $detallePermiso->save();
-
-        // return response()->json([
-        //     'success' => true
-        // ], 201);
-
-
-        // return $request;
-        // die;
+        $permiso = new Permiso();
+        $permiso->tipoPermiso_id = $request->tipoPermiso_id;
+        $permiso->habilitado = 'S';
+        $permiso->save();
 
         $detallePermiso = new DetallePermiso();
         $detallePermiso->documento_id = $request->documento_id;
         $detallePermiso->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
         $detallePermiso->colaborador_id = $request->colaborador_id == 0 ? null : $request->colaborador_id;
-        $detallePermiso->permiso_id = $request->permiso_id;
+        $detallePermiso->permiso_id = $permiso->id;
         $detallePermiso->habilitado = 'S';
         $detallePermiso->save();
 
         return response()->json([
             'success' => true
         ], 201);
+
+
+        // return $request;
+        // die;
+
+        // $detallePermiso = new DetallePermiso();
+        // $detallePermiso->documento_id = $request->documento_id;
+        // $detallePermiso->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
+        // $detallePermiso->colaborador_id = $request->colaborador_id == 0 ? null : $request->colaborador_id;
+        // $detallePermiso->permiso_id = $request->permiso_id;
+        // $detallePermiso->habilitado = 'S';
+        // $detallePermiso->save();
+
+        // return response()->json([
+        //     'success' => true
+        // ], 201);
 
 
 

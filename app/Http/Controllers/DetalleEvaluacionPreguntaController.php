@@ -60,7 +60,17 @@ class DetalleEvaluacionPreguntaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $resultados = DetalleEvaluacionPregunta::select('detalle_evaluacion_preguntas.evaluacion_id', 'preguntas.valorPregunta', 'preguntas.tipoPregunta_id', 'respuestas.valorRespuesta')
+                                                ->join('preguntas', 'detalle_evaluacion_preguntas.pregunta_id', '=', 'preguntas.id')
+                                                ->join('detalle_pregunta_respuestas', 'detalle_pregunta_respuestas.pregunta_id', '=', 'preguntas.id')
+                                                ->join('respuestas', 'detalle_pregunta_respuestas.respuesta_id', '=', 'respuestas.id')
+                                                ->where('detalle_evaluacion_preguntas.evaluacion_id', '=', $request->id)
+                                                ->get();
+
+        return response()->json([
+            'dataDB' => $resultados,
+            'success' => true
+        ], 201);                                                
     }
 
     /**
