@@ -205,6 +205,23 @@ class DetalleArchivoDocumentoController extends Controller
         ]);
     }
 
+    public function buscarDocDeshabilitados(Request $request)
+    {
+        //
+        $resultados = DB::table('documentos')
+                ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
+                ->select('documentos.id', 'documentos.titulo', 'detalle_archivo_documentos.habilitado')
+                ->where('documentos.tipoDocumento_id', '=', $request->id)
+                ->where('detalle_archivo_documentos.habilitado', '=', 'N')
+                ->distinct()
+                ->get();
+
+        return response()->json([
+            'dataDB' => $resultados,
+            'success' => true
+        ]);
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -236,6 +253,11 @@ class DetalleArchivoDocumentoController extends Controller
                 'nombreArchivo' => $request->titulo,
                 'disponible' => $request->disponible,
             ]);
+
+            return response()->json([
+                'dataDB' => $detalleDoc,
+                'success' => true
+            ]);
         }
         else 
         {
@@ -257,6 +279,11 @@ class DetalleArchivoDocumentoController extends Controller
             //$detalleDoc->urlArchivo = $filePath;
             $detalleDoc->disponible = $request->disponible;
             $detalleDoc->save();
+
+            return response()->json([
+                'dataDB' => $detalleDoc,
+                'success' => true
+            ]);
         }
     }
 

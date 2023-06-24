@@ -46,7 +46,15 @@ class DetallePermisoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $colaborador_permisos = DB::table('detalle_permisos')
+                    ->select('colaborador_id')
+                    ->where('documento_id', '=', $request->id)
+                    ->get();
+        return response()->json([
+            'dataDB' => $colaborador_permisos,
+            'success' => true
+        ]);
+
     }
 
     /**
@@ -138,28 +146,61 @@ class DetallePermisoController extends Controller
      */
     public function update(Request $request)
     {
-        if($request->id) {
-            $documento = DetallePermiso::find($request->id);
-            $documento->update([
-                'permiso_id' => $request->permiso_id,
-                'documento_id' => $request->documento_id,
-                'departamento_id' => $request->departamento_id,
-                'colaborador_id' => $request->colaborador_id,
-                'updated_at' => $request->fechaRegistro,
-                // 'habilitado' => 'S',
+        // if($request->id) {
+        //     $documento = DetallePermiso::find($request->id);
+        //     $documento->update([
+        //         'permiso_id' => $request->permiso_id,
+        //         'documento_id' => $request->documento_id,
+        //         'departamento_id' => $request->departamento_id,
+        //         'colaborador_id' => $request->colaborador_id,
+        //         'updated_at' => $request->fechaRegistro,
+        //         // 'habilitado' => 'S',
 
-                // 'permiso_id': this.idP,
-                // 'documento_id': this.idD,
-                // 'tipoPermiso_id': tipo.value,
-                // 'departamento_id': idDepar,
-                // 'colaborador_id': idColab,
-                // 'fechaRegistro': today,
-            ]);
-        } 
+        //         // 'permiso_id': this.idP,
+        //         // 'documento_id': this.idD,
+        //         // 'tipoPermiso_id': tipo.value,
+        //         // 'departamento_id': idDepar,
+        //         // 'colaborador_id': idColab,
+        //         // 'fechaRegistro': today,
+        //     ]);
+        // }
 
-        return response()->json([
-            'success' => true
-        ], 201);
+        if($request->documento_id) {
+            // Paso 1: Obtener los nuevos usuarios_id
+            $nuevosPermisosUserId = $request->input('colaborador_id');
+            
+            $cadenas = $nuevosPermisosUserId;
+            $array = explode(',', $cadenas);
+            $numeros = array_map('intval', $array);
+
+            // Paso 2: Recuperar los registros existentes
+            $registrosExistente = DetallePermiso::where('documento_id', $request->documento_id)->get();
+        
+            // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+            $colaboradoresIdExistente = $registrosExistente->pluck('colaborador_id')->toArray();
+            $colaboradoresIdEliminar = array_diff($colaboradoresIdExistente, $numeros);
+            $colaboraoresIdAgregar = array_diff($numeros, $colaboradoresIdExistente);
+
+            //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+            DetallePermiso::where('documento_id', $request->documento_id)
+                            ->whereIn('colaborador_id', $colaboradoresIdEliminar)
+                            ->delete();
+
+            // Paso 5: Agregar los nuevos registros para los usuarios_id que no están en los registros existentes
+            foreach ($colaboraoresIdAgregar as $usersId) {
+                $detalle = new DetallePermiso();
+                $detalle->colaborador_id = $usersId;
+                $detalle->departamento_id = null;
+                $detalle->documento_id = $request->documento_id;
+                $detalle->permiso_id = $registrosExistente[0]->permiso_id;
+                $detalle->habilitado = 'S';
+                $detalle->save();
+            }
+
+            return response()->json([
+                'success' => true
+            ], 201);
+        }
     }
 
     /**

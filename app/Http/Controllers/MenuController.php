@@ -15,8 +15,11 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        $menus = Menu::all();
-        return $menus;
+        $menus = Menu::all()->where('habilitado', '=', 'S');
+        return response()->json([
+            'dataDB' => $menus,
+            'success' => true
+        ]);
 
         // $menus = DB::table('menus')
         //     ->join('detalle_permisos_menus','detalle_permisos_menus.menu_id','=','menus.id')

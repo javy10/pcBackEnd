@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\AuthRequest;
+use App\Models\DetallePermisoMenu;
+use App\Models\PermisoMenu;
 use App\Models\User as User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +64,9 @@ class colaboradorController extends Controller
     public function createColaborador(Request $request)
     {
 
+        // return $request;
+        // die;
+
         // echo $request->foto;
         // echo gettype($request->foto);
 
@@ -93,7 +98,9 @@ class colaboradorController extends Controller
 
 
 
-         //return $request;
+
+
+        // //return $request;
         $file = $request->file('foto');
         if($file != null || $file != '') 
         {
@@ -116,6 +123,27 @@ class colaboradorController extends Controller
                 'foto' => $fileName,
             ]);
             $token = JWTAuth::fromUser($user);
+
+            $permisoMenu = new PermisoMenu();
+            $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+            $permisoMenu->habilitado = 'S';
+            $permisoMenu->save();
+            
+            $myArray = json_decode($request->menu_id);
+            
+            foreach ($myArray as $item) {
+                echo $item;
+                $detallePermisoMenu = new DetallePermisoMenu();
+                $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                $detallePermisoMenu->menu_id = $item;
+                $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
+                $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
+                $detallePermisoMenu->colaborador_id = $user->id;
+                $detallePermisoMenu->habilitado = 'S';
+                $detallePermisoMenu->save();
+            }
+
+
             return response()->json([
                 'user' => $user,
                 'token' => $token,
@@ -137,15 +165,32 @@ class colaboradorController extends Controller
                 'foto' => '',
             ]);
             $token = JWTAuth::fromUser($user);
+
+            $permisoMenu = new PermisoMenu();
+            $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+            $permisoMenu->habilitado = 'S';
+            $permisoMenu->save();
+
+            $myArray = json_decode($request->menu_id);
+            
+            foreach ($myArray as $item) {
+                echo $item;
+                $detallePermisoMenu = new DetallePermisoMenu();
+                $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                $detallePermisoMenu->menu_id = $item;
+                $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
+                $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
+                $detallePermisoMenu->colaborador_id = $user->id;
+                $detallePermisoMenu->habilitado = 'S';
+                $detallePermisoMenu->save();
+            }
+
             return response()->json([
                 'user' => $user,
                 'token' => $token,
                 'success' => true
             ], 201);
         }
-
-
-
 
     }
 
@@ -201,6 +246,37 @@ class colaboradorController extends Controller
         $colab = User::find($request->id);
         return response()->json([
             'dataDB' => $colab,
+            'success' => true
+        ]);
+
+        // $user = User::select('nombres', 'apellidos', 'dui', 'telefono', 'email', 'foto', 'agencias.nombre as Agencia', 'agencias.id as agencia_id', 'departamentos.nombre as Departamento', 'departamentos.id as departamento_id', 'cargos.nombre as Cargo', 'cargos.id as cargo_id')
+        //             ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+        //             ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+        //             ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+        //             ->where('users.id', '=', $request->id)
+        //             ->get();
+        // return response()->json([
+        //     'dataDB' => $user,
+        //     'success' => true
+        // ]);
+    }
+
+    public function obtenerColaboradorID(Request $request)
+    {
+        // $colab = User::find($request->id);
+        // return response()->json([
+        //     'dataDB' => $colab,
+        //     'success' => true
+        // ]);
+
+        $user = User::select('nombres', 'apellidos', 'dui', 'telefono', 'email', 'foto', 'agencias.nombre as Agencia', 'agencias.codAgencia', 'agencias.id as agencia_id', 'departamentos.nombre as Departamento', 'departamentos.id as departamento_id', 'cargos.nombre as Cargo', 'cargos.id as cargo_id')
+                    ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+                    ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+                    ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+                    ->where('users.id', '=', $request->id)
+                    ->get();
+        return response()->json([
+            'dataDB' => $user,
             'success' => true
         ]);
     }
@@ -367,7 +443,7 @@ class colaboradorController extends Controller
                 'departamento_id' => $request->departamento_id,
                 'cargo_id' => $request->cargo_id,
                 'telefono' => $request->telefono,
-                'email' => $request->correo,
+                'email' => $request->email,
             ]);
             return response()->json([
                 'dataDB' => $user,
@@ -383,8 +459,9 @@ class colaboradorController extends Controller
                 'departamento_id' => $request->departamento_id,
                 'cargo_id' => $request->cargo_id,
                 'telefono' => $request->telefono,
-                'email' => $request->correo,
+                'email' => $request->email,
             ]);
+
             return response()->json([
                 'dataDB' => $user,
                 'success' => true

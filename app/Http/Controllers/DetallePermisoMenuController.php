@@ -89,26 +89,27 @@ class DetallePermisoMenuController extends Controller
         // return $request;
         // die;
 
-        $permisoMenu = new PermisoMenu();
-        $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
-        $permisoMenu->habilitado = 'S';
-        $permisoMenu->save();
+        // $permisoMenu = new PermisoMenu();
+        // $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+        // $permisoMenu->habilitado = 'S';
+        // $permisoMenu->save();
+        
 
-        $detallePermisoMenu = new DetallePermisoMenu();
-        $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
-        $detallePermisoMenu->menu_id = $request->menu_id;
-        $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
-        $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
-        $detallePermisoMenu->colaborador_id = $request->colaborador_id == 0 ? null : $request->colaborador_id;
-        $detallePermisoMenu->habilitado = 'S';
-        $detallePermisoMenu->save();
+        // $detallePermisoMenu = new DetallePermisoMenu();
+        // $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+        // $detallePermisoMenu->menu_id = $request->menu_id;
+        // $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
+        // $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
+        // $detallePermisoMenu->colaborador_id = $request->colaborador_id == 0 ? null : $request->colaborador_id;
+        // $detallePermisoMenu->habilitado = 'S';
+        // $detallePermisoMenu->save();
 
-        return response()->json([
+        // return response()->json([
             
-            'permisoMenu' => $permisoMenu,
-            'detallePermiso' => $detallePermisoMenu,
-            'success' => true
-        ], 201);
+        //     'permisoMenu' => $permisoMenu,
+        //     'detallePermiso' => $detallePermisoMenu,
+        //     'success' => true
+        // ], 201);
     }
 
     /**
@@ -130,7 +131,15 @@ class DetallePermisoMenuController extends Controller
      */
     public function show($id)
     {
-        //
+        $menu = DetallePermisoMenu::select('menu_id')
+                                ->where('colaborador_id', '=', $id)
+                                ->where('habilitado', '=', 'S')
+                                ->get();
+        return response()->json([
+            
+            'dataDB' => $menu,
+            'success' => true
+        ], 201);
     }
 
     /**
@@ -139,9 +148,44 @@ class DetallePermisoMenuController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+
+        // Paso 1: Obtener los nuevos usuarios_id
+        $nuevosMenusId = $request->input('menu_id');
+        //$nuevosMenusId = $myArray;
+        $cadenas = $nuevosMenusId;
+        $array = explode(',', $cadenas);
+        $numeros = array_map('intval', $array);
+
+        // Paso 2: Recuperar los registros existentes
+        $registrosExistente = DetallePermisoMenu::where('colaborador_id', $request->id)->get();
+     
+        // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+        $menusIdExistente = $registrosExistente->pluck('menu_id')->toArray();
+        $menusIdEliminar = array_diff($menusIdExistente, $numeros);
+        $menusIdAgregar = array_diff($numeros, $menusIdExistente);
+
+        //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+        DetallePermisoMenu::where('colaborador_id', $request->id)
+                        ->whereIn('menu_id', $menusIdEliminar)
+                        ->delete();
+
+        // Paso 5: Agregar los nuevos registros para los usuarios_id que no están en los registros existentes
+        foreach ($menusIdAgregar as $menusId) {
+            $detallePermisoMenu = new DetallePermisoMenu();
+            $detallePermisoMenu->permisoMenu_id = $registrosExistente[0]->permisoMenu_id;
+            $detallePermisoMenu->menu_id = $menusId;
+            $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
+            $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
+            $detallePermisoMenu->colaborador_id = $request->id;
+            $detallePermisoMenu->habilitado = 'S';
+            $detallePermisoMenu->save();
+        }
+        
+        return response()->json([
+            'success' => true
+        ], 200);
     }
 
     /**

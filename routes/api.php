@@ -61,26 +61,27 @@ Route::controller(AuthController::class)->group(function() {
 // Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 // Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
-
-Route::controller(colaboradorController::class)->group(function() {
-    Route::get('colaboradores','index')->name('colaboradores');
-    Route::get('colaboradoresDeshabilitados','Deshabilitados')->name('colaboradoresDeshabilitados');
-    Route::post('colaborador','createColaborador')->name('createcolaborador');
-    Route::get('eliminarcolaborador/{id}','edit')->name('eliminarcolaborador');
-    Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
-    Route::get('colaborador/{id}','show')->name('buscarcolaboradorId');
-    Route::post('editarcolaborador','update')->name('editarColaborador');
-    Route::get('login/{dui}','buscar')->name('buscarColaboradorDui');
-    Route::get('editarintentos/{dui}','editarIntentos')->name('editarintentos');
-    Route::get('editarIntentosEquivocados/{dui}','editarIntentosEquivocados')->name('editarintentos');
-    Route::post('editPassword','editPassword')->name('editPassword');
-    Route::get('fotoURL/{nombre}', 'obtenerFoto')->name('fotoUrl');
-    //Route::post('login','singIn')->name('login');
-    Route::post('recover-password','recover')->name('recover-password');
-    Route::get('obtenerUsersPorEmail/{email}','obtenerUsersPorEmail')->name('obtenerUsersPorEmail');
-    Route::post('buscarPorClave','buscarPorClave')->name('buscarPorClave');
-    
-});
+//Route::middleware(['api'])->group(function () {
+    Route::controller(colaboradorController::class)->group(function() {
+        Route::get('colaboradores','index')->name('colaboradores');
+        Route::get('colaboradoresDeshabilitados','Deshabilitados')->name('colaboradoresDeshabilitados');
+        Route::post('colaborador','createColaborador')->name('createcolaborador');
+        Route::get('eliminarcolaborador/{id}','edit')->name('eliminarcolaborador');
+        Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
+        Route::get('colaborador/{id}','show')->name('buscarcolaboradorId');
+        Route::get('obtenerColaboradorID/{id}','obtenerColaboradorID')->name('obtenerColaboradorID');
+        Route::post('editarcolaborador','update')->name('editarColaborador');
+        Route::get('login/{dui}','buscar')->name('buscarColaboradorDui');
+        Route::get('editarintentos/{dui}','editarIntentos')->name('editarintentos');
+        Route::get('editarIntentosEquivocados/{dui}','editarIntentosEquivocados')->name('editarintentos');
+        Route::post('editPassword','editPassword')->name('editPassword');
+        Route::get('fotoURL/{nombre}', 'obtenerFoto')->name('fotoUrl');
+        //Route::post('login','singIn')->name('login');
+        Route::post('recover-password','recover')->name('recover-password');
+        Route::get('obtenerUsersPorEmail/{email}','obtenerUsersPorEmail')->name('obtenerUsersPorEmail');
+        Route::post('buscarPorClave','buscarPorClave')->name('buscarPorClave');
+    });
+//});
 
 Route::controller(agenciaController::class)->group(function() {
     Route::get('agencias','index')->name('agencias');
@@ -128,7 +129,8 @@ Route::controller(DetalleArchivoDocumentoController::class)->group(function() {
     Route::get('detalleDocumento/{id}', 'buscarDetalle')->name('detalleDocumento');
     Route::post('guardarDetalle', 'create')->name('guardarDetalle');
     Route::post('editarDetalleDocumento','update')->name('editarDetalleDocumento');
-    Route::get('eliminarDetalledocumentos/{id}', 'edit')->name('documentos');
+    Route::get('eliminarDetalledocumentos/{id}', 'edit')->name('eliminarDetalledocumentos');
+    Route::get('documentoDeshabilitadosID/{id}', 'buscarDocDeshabilitados')->name('documentoDeshabilitadosID');
 });
 
 Route::controller(DetallePermisoController::class)->group(function() {
@@ -139,6 +141,7 @@ Route::controller(DetallePermisoController::class)->group(function() {
     Route::get('detalleID/{id}', 'detalleID')->name('detallePer');
     Route::post('editarDetallePermiso','update')->name('editarDetallePermiso');
     Route::get('eliminarDetallePermiso/{id}','edit')->name('eliminarDetallePermiso');
+    Route::get('buscarColaboradoresPermisos/{id}','store')->name('buscarColaboradoresPermisos');
 });
 
 Route::controller(PermisoController::class)->group(function() {
@@ -155,6 +158,8 @@ Route::controller(DetallePermisoMenuController::class)->group(function() {
     Route::post('detallePermisosMenuConfiguracion','detallePermisosMenuConfiguracion')->name('detallePermisosMenuConfiguracion');
     Route::post('configuracion', 'create')->name('configuracion');
     Route::post('editarconfiguracion','update')->name('editarconfiguracion');
+    Route::get('detallePermisosMenu/{id}', 'show')->name('detallePermisosMenu');
+    Route::post('editarDetallePermisosMenu','edit')->name('editarDetallePermisosMenu');
 });
 
 Route::controller(LogsEntradaSalidaController::class)->group(function() {

@@ -33,22 +33,23 @@ class TipoDocumentoController extends Controller
         // die;
 
         $documentos = DB::table('tipo_documentos')
-            ->join('documentos', 'documentos.tipoDocumento_id', '=', 'tipo_documentos.id')
-            ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
-            ->join('detalle_permisos','detalle_permisos.documento_id','=','documentos.id')
-            ->distinct()->select('tipo_documentos.tipo', 'tipo_documentos.id')
+                ->join('documentos', 'documentos.tipoDocumento_id', '=', 'tipo_documentos.id')
+                ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
+                ->join('detalle_permisos', 'detalle_permisos.documento_id', '=', 'documentos.id')
+                ->select('tipo_documentos.tipo', 'tipo_documentos.id')
+                ->distinct()
+                ->where(function ($query) use ($request) 
+                {
+                    $query->where('detalle_permisos.colaborador_id', '=', $request->idC)
+                        ->orWhere('detalle_permisos.departamento_id', '=', $request->idD);
+                })
+                ->where('detalle_archivo_documentos.disponible', '=', 'S')
+                ->where('detalle_archivo_documentos.habilitado', '=', 'S')
+                ->where('tipo_documentos.habilitado', '=', 'S')
+                ->get();
 
-            // ->Where('detalle_permisos.colaborador_id','=', $request->idC)
-            // ->orWhere('detalle_permisos.departamento_id','=', $request->idD)
 
-            ->where(function ($query) use ($request) {
-                $query->Where('detalle_permisos.colaborador_id','=', $request->idC)
-                    ->orWhere('detalle_permisos.departamento_id','=', $request->idD);
-            })
 
-            ->where('tipo_documentos.habilitado','=','S')
-            ->where('detalle_archivo_documentos.disponible','=','S')
-            ->get();
         return response()->json([
             'dataDB' => $documentos,
             'success' => true

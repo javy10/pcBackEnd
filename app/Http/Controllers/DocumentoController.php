@@ -39,7 +39,7 @@ class DocumentoController extends Controller
     public function create(Request $request)
     {
 
-        // return $request->url . $request->detalleDoc;
+        // return $request->colaborador_id;
         // die;
 
         // $arr1 = json_decode(( $request->tipoPermiso_id ));
@@ -57,6 +57,24 @@ class DocumentoController extends Controller
         $documento->colaborador_id = $request->usuario_id;
         $documento->tipoDocumento_id = $request->tipoDocumento_id;
         $documento->save();
+
+        $permiso = new Permiso();
+        $permiso->tipoPermiso_id = $request->tipoPermiso_id;
+        $permiso->habilitado = 'S';
+        $permiso->save();
+
+        $myArray = json_decode($request->colaborador_id);
+            
+        foreach ($myArray as $item) {
+            $detallePermiso = new DetallePermiso();
+            $detallePermiso->colaborador_id = $item;
+            $detallePermiso->departamento_id =  null;
+            $detallePermiso->documento_id = $documento->id;
+            $detallePermiso->permiso_id = $permiso->id;
+            $detallePermiso->habilitado = 'S';
+            $detallePermiso->save();
+        }
+
 
         return response()->json([
             'success' => true
@@ -122,12 +140,11 @@ class DocumentoController extends Controller
      */
     public function show()
     {
-        // $documentos = DB::table('detalle_archivo_documentos')
-        //     ->join('documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
+        
+        // $documentos = DB::table('documentos')
         //     ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
-        //     ->select('documentos.id','documentos.titulo','tipo_documentos.tipo','documentos.tipoDocumento_id', 'detalle_archivo_documentos.nombreArchivo','documentos.created_at')
+        //     ->select('documentos.id','documentos.titulo','tipo_documentos.tipo','documentos.tipoDocumento_id','documentos.created_at')
         //     ->where('documentos.habilitado','=','S')
-        //     ->where('disponible', '=', 0)
         //     ->get();
         // return response()->json([
         //     'dataDB' => $documentos,
@@ -135,10 +152,16 @@ class DocumentoController extends Controller
         // ]);
 
         $documentos = DB::table('documentos')
-            ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
-            ->select('documentos.id','documentos.titulo','tipo_documentos.tipo','documentos.tipoDocumento_id','documentos.created_at')
-            ->where('documentos.habilitado','=','S')
-            ->get();
+                        ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
+                        ->join('detalle_permisos', 'detalle_permisos.documento_id', '=', 'documentos.id')
+                        ->join('permisos', 'detalle_permisos.permiso_id', '=', 'permisos.id')
+                        ->join('tipo_documentos', 'documentos.tipoDocumento_id', '=', 'tipo_documentos.id')
+                        ->distinct()
+                        ->select('documentos.id', 'documentos.titulo', 'tipo_documentos.tipo', 'documentos.tipoDocumento_id', 'documentos.created_at')
+                        ->where('detalle_archivo_documentos.disponible', '=', 'S')
+                        ->where('detalle_archivo_documentos.lectura', '=', 'S')
+                        ->where('detalle_archivo_documentos.habilitado', '=', 'S')
+                        ->get();
         return response()->json([
             'dataDB' => $documentos,
             'success' => true
@@ -147,7 +170,7 @@ class DocumentoController extends Controller
 
     public function buscarID(Request $request)
     {
-        $documento = Documento::find($request->id);
+        $documento = Documento::find($request->id)->where('habilitado','=', 'S');
         return response()->json([
             'dataDB' => $documento,
             'success' => true
@@ -194,6 +217,7 @@ class DocumentoController extends Controller
                 'updated_at' => $request->updated_at,
                 // 'habilitado' => 'S',
             ]);
+
         } else {
             
         }
