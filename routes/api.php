@@ -63,8 +63,8 @@ Route::controller(AuthController::class)->group(function() {
 
 //Route::middleware(['api'])->group(function () {
     Route::controller(colaboradorController::class)->group(function() {
-        Route::get('colaboradores','index')->name('colaboradores');
-        Route::get('colaboradoresDeshabilitados','Deshabilitados')->name('colaboradoresDeshabilitados');
+        Route::get('colaboradores','index')->name('colaboradores')->middleware('auth');
+        Route::get('colaboradoresDeshabilitados','Deshabilitados')->name('colaboradoresDeshabilitados')->middleware('auth');
         Route::post('colaborador','createColaborador')->name('createcolaborador');
         Route::get('eliminarcolaborador/{id}','edit')->name('eliminarcolaborador');
         Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
@@ -74,9 +74,10 @@ Route::controller(AuthController::class)->group(function() {
         Route::get('login/{dui}','buscar')->name('buscarColaboradorDui');
         Route::get('editarintentos/{dui}','editarIntentos')->name('editarintentos');
         Route::get('editarIntentosEquivocados/{dui}','editarIntentosEquivocados')->name('editarintentos');
+        Route::get('reestablecerIntentos/{dui}','reestablecerIntentos')->name('reestablecerIntentos');
         Route::post('editPassword','editPassword')->name('editPassword');
         Route::get('fotoURL/{nombre}', 'obtenerFoto')->name('fotoUrl');
-        //Route::post('login','singIn')->name('login');
+        //Route::post('login','singIn')->name('login');;
         Route::post('recover-password','recover')->name('recover-password');
         Route::get('obtenerUsersPorEmail/{email}','obtenerUsersPorEmail')->name('obtenerUsersPorEmail');
         Route::post('buscarPorClave','buscarPorClave')->name('buscarPorClave');
@@ -84,87 +85,87 @@ Route::controller(AuthController::class)->group(function() {
 //});
 
 Route::controller(agenciaController::class)->group(function() {
-    Route::get('agencias','index')->name('agencias');
-    Route::get('agencia/{id}','show')->name('buscaragenciaId');
+    Route::get('agencias','index')->name('agencias')->middleware('auth');
+    Route::get('agencia/{id}','show')->name('buscaragenciaId')->middleware('auth');
 });
 
 Route::controller(departamentoController::class)->group(function() {
-    Route::get('departamentos','index')->name('departamentos');
-    Route::get('departamento/{id}','show')->name('buscardepartamentoId');
+    Route::get('departamentos','index')->name('departamentos')->middleware('auth');
+    Route::get('departamento/{id}','show')->name('buscardepartamentoId')->middleware('auth');
 });
 
 Route::controller(cargoController::class)->group(function() {
-    Route::get('cargos','index')->name('cargos');
-    Route::get('cargos/{id}','show')->name('cargosId');
-    Route::get('cargo/{id}','buscar')->name('cargoId');
-    Route::post('guardarCargo','create')->name('guardarCargo');
+    Route::get('cargos','index')->name('cargos')->middleware('auth');
+    Route::get('cargos/{id}','show')->name('cargosId')->middleware('auth');
+    Route::get('cargo/{id}','buscar')->name('cargoId')->middleware('auth');
+    Route::post('guardarCargo','create')->name('guardarCargo')->middleware('auth');
 });
 
 Route::controller(TipoDocumentoController::class)->group(function() {
-    Route::post('tipoDocumento','create')->name('tipoDocumento');
-    Route::get('tipoDocumentos','index')->name('tipoDocumentos');
-    Route::post('buscarTipoDocumentos','buscarTipo')->name('tipoDocumentos');
-    Route::get('tiposDocumentos','tipoDocumentos')->name('tipoDocumentos');
-    Route::get('tipoDocumentos/{id}','show')->name('buscartipoDocumentosId');
-    Route::get('eliminarTipoDocumento/{id}','edit')->name('eliminartipoDocumentosId');
-    Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
-    Route::post('editar','update')->name('editar');
+    Route::post('tipoDocumento','create')->name('tipoDocumento')->middleware('auth');
+    Route::get('tipoDocumentos','index')->name('tipoDocumentos')->middleware('auth');
+    Route::post('buscarTipoDocumentos','buscarTipo')->name('tipoDocumentos')->middleware('auth');
+    Route::get('tiposDocumentos','tipoDocumentos')->name('tipoDocumentos')->middleware('auth');
+    Route::get('tipoDocumentos/{id}','show')->name('buscartipoDocumentosId')->middleware('auth');
+    Route::get('eliminarTipoDocumento/{id}','edit')->name('eliminartipoDocumentosId')->middleware('auth');
+    Route::get('desbloquear/{id}','desbloquear')->name('desbloquear')->middleware('auth');
+    Route::post('editar','update')->name('editar')->middleware('auth');
 });
 
 Route::controller(DocumentoController::class)->group(function() {
-    Route::post('documentos', 'create')->name('documentos');
-    Route::get('listaDocumentos', 'show')->name('documentos');
-    Route::get('eliminardocumentos/{id}', 'edit')->name('documentos');
-    Route::get('documentos/{nombre}', 'index')->name('documentos');
-    Route::get('documentoID/{id}', 'buscarID')->name('documentos');
-    Route::post('editarDocumento','update')->name('editarDocumento');
-    Route::post('guardarPermiso','crearPermiso')->name('crearPermiso');
+    Route::post('documentos', 'create')->name('documentos')->middleware('auth');
+    Route::get('listaDocumentos', 'show')->name('documentos')->middleware('auth');
+    Route::get('eliminardocumentos/{id}', 'edit')->name('documentos')->middleware('auth');
+    Route::get('documentos/{nombre}', 'index')->name('documentos')->middleware('auth');
+    Route::get('documentoID/{id}', 'buscarID')->name('documentos')->middleware('auth');
+    Route::post('editarDocumento','update')->name('editarDocumento')->middleware('auth');
+    Route::post('guardarPermiso','crearPermiso')->name('crearPermiso')->middleware('auth');
     
 });
 
 Route::controller(DetalleArchivoDocumentoController::class)->group(function() {
-    Route::get('documentos', 'show')->name('documentos');
-    Route::post('documentosList', 'obtenerDocumentosID')->name('obtenerDocumentosID');
-    Route::get('detalleDoc/{id}', 'index')->name('detalleDoc');
-    Route::get('detalleDocumento/{id}', 'buscarDetalle')->name('detalleDocumento');
-    Route::post('guardarDetalle', 'create')->name('guardarDetalle');
-    Route::post('editarDetalleDocumento','update')->name('editarDetalleDocumento');
-    Route::get('eliminarDetalledocumentos/{id}', 'edit')->name('eliminarDetalledocumentos');
-    Route::get('documentoDeshabilitadosID/{id}', 'buscarDocDeshabilitados')->name('documentoDeshabilitadosID');
+    Route::get('documentos', 'show')->name('documentos')->middleware('auth');
+    Route::post('documentosList', 'obtenerDocumentosID')->name('obtenerDocumentosID')->middleware('auth');
+    Route::get('detalleDoc/{id}', 'index')->name('detalleDoc')->middleware('auth');
+    Route::get('detalleDocumento/{id}', 'buscarDetalle')->name('detalleDocumento')->middleware('auth');
+    Route::post('guardarDetalle', 'create')->name('guardarDetalle')->middleware('auth');
+    Route::post('editarDetalleDocumento','update')->name('editarDetalleDocumento')->middleware('auth');
+    Route::get('eliminarDetalledocumentos/{id}', 'edit')->name('eliminarDetalledocumentos')->middleware('auth');
+    Route::get('documentoDeshabilitadosID/{id}', 'buscarDocDeshabilitados')->name('documentoDeshabilitadosID')->middleware('auth');
 });
 
 Route::controller(DetallePermisoController::class)->group(function() {
-    Route::get('permisos', 'index')->name('permisos');
-    Route::get('obtenerDetallePermiso', 'obtenerDetallePermiso')->name('obtenerDetallePermiso');
-    Route::get('detallePermisos/{id}', 'show')->name('permisos');
-    Route::get('detalleDocPermisos/{id}', 'obtenerDetallePermisoID')->name('detalleDocPermisos');
-    Route::get('detalleID/{id}', 'detalleID')->name('detallePer');
-    Route::post('editarDetallePermiso','update')->name('editarDetallePermiso');
-    Route::get('eliminarDetallePermiso/{id}','edit')->name('eliminarDetallePermiso');
-    Route::get('buscarColaboradoresPermisos/{id}','store')->name('buscarColaboradoresPermisos');
+    Route::get('permisos', 'index')->name('permisos')->middleware('auth');
+    Route::get('obtenerDetallePermiso', 'obtenerDetallePermiso')->name('obtenerDetallePermiso')->middleware('auth');
+    Route::get('detallePermisos/{id}', 'show')->name('permisos')->middleware('auth');
+    Route::get('detalleDocPermisos/{id}', 'obtenerDetallePermisoID')->name('detalleDocPermisos')->middleware('auth');
+    Route::get('detalleID/{id}', 'detalleID')->name('detallePer')->middleware('auth');
+    Route::post('editarDetallePermiso','update')->name('editarDetallePermiso')->middleware('auth');
+    Route::get('eliminarDetallePermiso/{id}','edit')->name('eliminarDetallePermiso')->middleware('auth');
+    Route::get('buscarColaboradoresPermisos/{id}','store')->name('buscarColaboradoresPermisos')->middleware('auth');
 });
 
 Route::controller(PermisoController::class)->group(function() {
-    Route::post('editarPermiso','update')->name('editarPermiso');
+    Route::post('editarPermiso','update')->name('editarPermiso')->middleware('auth');
 });
 
 Route::controller(MenuController::class)->group(function() {
-    Route::get('menus','index')->name('menus');
+    Route::get('menus','index')->name('menus')->middleware('auth');
 });
 
 Route::controller(DetallePermisoMenuController::class)->group(function() {
-    Route::get('obtenerDetalle', 'obtenerDetalle')->name('obtenerDetalle');
-    Route::post('detallePermisosMenu','index')->name('detalles');
-    Route::post('detallePermisosMenuConfiguracion','detallePermisosMenuConfiguracion')->name('detallePermisosMenuConfiguracion');
-    Route::post('configuracion', 'create')->name('configuracion');
-    Route::post('editarconfiguracion','update')->name('editarconfiguracion');
-    Route::get('detallePermisosMenu/{id}', 'show')->name('detallePermisosMenu');
-    Route::post('editarDetallePermisosMenu','edit')->name('editarDetallePermisosMenu');
+    Route::get('obtenerDetalle', 'obtenerDetalle')->name('obtenerDetalle')->middleware('auth');
+    Route::post('detallePermisosMenu','index')->name('detalles')->middleware('auth');
+    Route::post('detallePermisosMenuConfiguracion','detallePermisosMenuConfiguracion')->name('detallePermisosMenuConfiguracion')->middleware('auth');
+    Route::post('configuracion', 'create')->name('configuracion')->middleware('auth');
+    Route::post('editarconfiguracion','update')->name('editarconfiguracion')->middleware('auth');
+    Route::get('detallePermisosMenu/{id}', 'show')->name('detallePermisosMenu')->middleware('auth');
+    Route::post('editarDetallePermisosMenu','edit')->name('editarDetallePermisosMenu')->middleware('auth');
 });
 
 Route::controller(LogsEntradaSalidaController::class)->group(function() {
-    Route::post('editarSalida','editarSalida')->name('editarSalida');
-    Route::post('editarEntrada','editarEntrada')->name('editarEntrada');
+    Route::post('editarSalida','editarSalida')->name('editarSalida')->middleware('auth');
+    Route::post('editarEntrada','editarEntrada')->name('editarEntrada')->middleware('auth');
 });
 
 Route::controller(GrupoController::class)->group(function() {

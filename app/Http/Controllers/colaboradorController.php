@@ -343,6 +343,20 @@ class colaboradorController extends Controller
         ]);
     }
 
+    public function reestablecerIntentos(Request $request)
+    {
+        // return $request->dui;
+        // die;
+       
+        $colab = DB::table('users')
+                ->where('users.dui', $request->dui)
+                ->update(['intentos' => 5]);
+
+        return response()->json([
+            'dataDB' => $colab,
+            'success' => true
+        ]);
+    }
     public function editarIntentos(Request $request)
     {
         // return $request->dui;

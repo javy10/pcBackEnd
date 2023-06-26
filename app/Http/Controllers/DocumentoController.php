@@ -170,7 +170,14 @@ class DocumentoController extends Controller
 
     public function buscarID(Request $request)
     {
-        $documento = Documento::find($request->id)->where('habilitado','=', 'S');
+
+        // return $request->id;
+        // die;
+
+        //print_r($request->id);
+        //die;
+        // $documento = Documento::find($request->id)->where('habilitado','=', 'S');
+        $documento = Documento::where('id', $request->id)->where('habilitado', 'S')->get();
         return response()->json([
             'dataDB' => $documento,
             'success' => true
