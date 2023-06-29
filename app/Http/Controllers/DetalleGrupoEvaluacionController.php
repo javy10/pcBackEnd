@@ -129,6 +129,7 @@ class DetalleGrupoEvaluacionController extends Controller
                     ->select('evaluaciones.nombre as Evaluacion', 'agencias.nombre as Agencia', DB::raw("CONCAT(users.nombres, ' ', users.apellidos) AS Colaborador"), 'resultados.resultado as Nota', 'evaluaciones.calificacionMinima as NotaMinima')
                     ->where('grupo_evaluaciones.apertura', '>=', $request->apertura)
                     ->where('grupo_evaluaciones.cierre', '<=', $request->cierre)
+                    ->where('evaluaciones.id', '<=', $request->id)
                     ->get();
         return response()->json([
             'dataDB' => $resultados,
@@ -136,13 +137,14 @@ class DetalleGrupoEvaluacionController extends Controller
         ]);
 }
 
-    public function intentosColaboradores()
+    public function intentosColaboradores(Request $request)
     {
         $resultado = DB::table('detalle_grupo_evaluaciones')
                         ->join('users', 'detalle_grupo_evaluaciones.colaborador_id', '=', 'users.id')
                         ->join('evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
                         ->select(DB::raw("CONCAT(users.nombres,' ', users.apellidos) as nombreCompleto, evaluaciones.nombre, detalle_grupo_evaluaciones.id, detalle_grupo_evaluaciones.intentos"))
                         ->where('evaluaciones.habilitado', '=', 'S')
+                        ->where('evaluaciones.id', '=', $request->id)
                         ->where('detalle_grupo_evaluaciones.intentos', '=', 0)
                         ->get();
 

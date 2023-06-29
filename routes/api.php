@@ -171,6 +171,7 @@ Route::controller(LogsEntradaSalidaController::class)->group(function() {
 Route::controller(GrupoController::class)->group(function() {
     Route::post('crearGrupo','create')->name('create');
     Route::get('obtenerGrupoID/{id}','show')->name('obtenerGrupoID');
+    Route::get('obtenerGruposPorEvaluacion/{id}','index')->name('obtenerGruposPorEvaluacion');
     Route::get('obtenerColaboradoresGrupoID/{id}','store')->name('obtenerColaboradoresGrupoID');
     Route::post('editarGrupo','update')->name('editarGrupo');
     Route::get('eliminarGrupo/{id}','edit')->name('eliminarGrupo');
@@ -194,7 +195,7 @@ Route::controller(DetalleGrupoEvaluacionController::class)->group(function() {
     Route::post('editarDetalleGrupo','update')->name('editarDetalleGrupo');
     Route::get('habilitarEvaluacion/{id}','habilitarEvaluacion')->name('habilitarEvaluacion');
     Route::get('obtenerDetalleGrupoEvaluacion/{id}','show')->name('obtenerDetalleGrupoEvaluacion');
-    Route::get('intentosColaboradores','intentosColaboradores')->name('intentosColaboradores');
+    Route::get('intentosColaboradores/{id}','intentosColaboradores')->name('intentosColaboradores');
     Route::get('habilitarIntentosEvaluacion/{id}','habilitarIntentosEvaluacion')->name('habilitarIntentosEvaluacion');
     Route::post('obtenerResultadosEvaluacion', 'obtenerResultadosEvaluacion')->name('obtenerResultadosEvaluacion');
 });

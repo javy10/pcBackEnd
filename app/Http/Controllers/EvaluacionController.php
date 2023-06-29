@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DetalleGrupoEvaluaciones;
 use App\Models\Evaluaciones;
+use App\Models\GrupoEvaluaciones;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -15,13 +16,22 @@ class EvaluacionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        $evaluaciones = Evaluaciones::select('grupo_evaluaciones.nombre as grupo', 'detalle_grupo_evaluaciones.colaborador_id as colaborador_id', 'evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'detalle_grupo_evaluaciones.intentos', 'evaluaciones.created_at')
-            ->distinct()
-            ->join('detalle_grupo_evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
-            ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
-            ->where('evaluaciones.habilitado', '=', 'S')
-            ->get();
+    { //'detalle_grupo_evaluaciones.colaborador_id as colaborador_id', 
+        // $evaluaciones = DB::table('evaluaciones')
+        //                     ->select('evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'detalle_grupo_evaluaciones.intentos', 'evaluaciones.created_at')
+        //                     ->distinct()
+        //                     ->join('detalle_grupo_evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
+        //                     ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
+        //                     ->where('evaluaciones.habilitado', '=', 'S')
+        //                     ->get();
+
+        $evaluaciones = Evaluaciones::selectRaw('COUNT(DISTINCT detalle_grupo_evaluaciones.grupo_id) AS grupo, evaluaciones.id, evaluaciones.nombre, evaluaciones.descripcion, evaluaciones.cantidadPreguntas, detalle_grupo_evaluaciones.intentos, evaluaciones.created_at')
+                    ->join('detalle_grupo_evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
+                    ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
+                    ->where('evaluaciones.habilitado', '=', 'S')
+                    ->where('grupo_evaluaciones.habilitado', '=', 'S')
+                    ->groupBy('evaluaciones.id')
+                    ->get();
 
         return response()->json([
             'dataDB' => $evaluaciones,
@@ -31,7 +41,8 @@ class EvaluacionController extends Controller
 
     public function obtenerEvaluacionesDeshabilitadas()
     {
-        $evaluaciones = Evaluaciones::select('grupo_evaluaciones.nombre as grupo', 'evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'evaluaciones.intentos', 'evaluaciones.created_at')
+        $evaluaciones = DB::table('evaluaciones')
+            ->select('grupo_evaluaciones.nombre as grupo', 'evaluaciones.id', 'evaluaciones.nombre', 'evaluaciones.descripcion', 'evaluaciones.cantidadPreguntas', 'evaluaciones.intentos', 'evaluaciones.created_at')
             ->distinct()
             ->join('detalle_grupo_evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
             ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
@@ -51,14 +62,51 @@ class EvaluacionController extends Controller
      */
     public function create(Request $request)
     {
+
+        // return $request->grupos;
+        // die;
+        // $evaluacion = new Evaluaciones();
+        // $evaluacion->nombre = $request->nombreE;
+        // $evaluacion->descripcion = $request->descripcion;
+        // $evaluacion->calificacionMinima = $request->calificacionMinima;
+        // $evaluacion->intentos = $request->intentos;
+        // $evaluacion->cantidadPreguntas = 0;
+        // $evaluacion->habilitado = 'S';
+        // $evaluacion->save();
+
+        // return response()->json([
+        //     'success' => true
+        // ], 201);
+
         $evaluacion = new Evaluaciones();
-        $evaluacion->nombre = $request->nombreE;
+        $evaluacion->nombre = $request->nombre;
         $evaluacion->descripcion = $request->descripcion;
         $evaluacion->calificacionMinima = $request->calificacionMinima;
         $evaluacion->intentos = $request->intentos;
         $evaluacion->cantidadPreguntas = 0;
         $evaluacion->habilitado = 'S';
         $evaluacion->save();
+
+        $myArray = json_decode($request->grupos);
+
+        foreach ($myArray as $item) {
+            $grupo = new GrupoEvaluaciones();
+            $grupo->nombre = $item->nombre;
+            $grupo->apertura = $item->apertura;
+            $grupo->cierre = $item->cierre;
+            $grupo->habilitado = 'S';
+            $grupo->save();
+
+            foreach ($item->usuarios as $user) {
+                $detalleGE = new DetalleGrupoEvaluaciones();
+                $detalleGE->grupo_id = $grupo->id;
+                $detalleGE->evaluacion_id = $evaluacion->id;
+                $detalleGE->colaborador_id = $user;
+                $detalleGE->intentos = $item->intentos;
+                $detalleGE->habilitado = 'S';
+                $detalleGE->save();
+            }
+        }
 
         return response()->json([
             'success' => true
@@ -126,21 +174,71 @@ class EvaluacionController extends Controller
 
         if (!$evaluacion) {
             return response()->json([
-                'message' => 'Evaluacion no encontrada',
+                'dataDB' => 'Evaluacion no encontrada',
                 'success' => false
             ], 404);
+        } else {
+
+            $evaluacion->update([
+                'nombre' => $request->nombre,
+                'descripcion' => $request->descripcion,
+                'calificacionMinima' => $request->calificacionMinima,
+                'intentos' => $request->intentos
+            ]);
+
+            $myArray = json_decode($request->grupos);
+
+            foreach ($myArray as $item) {
+
+                $grupo = GrupoEvaluaciones::find($item->id);
+                $grupo->update([
+                    'nombre' => $item->nombreG,
+                    'apertura' => $item->apertura,
+                    'cierre' => $item->cierre
+                ]);
+
+                // Paso 1: Obtener los nuevos usuarios_id
+                $nuevosPermisosUserId = $item->usuarios;
+                $cadenas = $nuevosPermisosUserId;
+                $numeros = array_map('intval', $cadenas);
+                
+                // Paso 2: Recuperar los registros existentes
+                $registrosExistente = DetalleGrupoEvaluaciones::where('grupo_id', $item->id)->get();
+                
+                // return $registrosExistente;
+                // die;
+
+                // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+                $colaboradoresIdExistente = $registrosExistente->pluck('colaborador_id')->toArray();
+                $colaboradoresIdEliminar = array_diff($colaboradoresIdExistente, $numeros);
+                $colaboraoresIdAgregar = array_diff($numeros, $colaboradoresIdExistente);
+
+                // return $colaboradoresIdEliminar;
+                // die;
+    
+                //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+                DetalleGrupoEvaluaciones::where('grupo_id', $item->id)
+                                ->whereIn('colaborador_id', $colaboradoresIdEliminar)
+                                ->delete();
+
+                // Paso 5: Agregar los nuevos registros para los usuarios_id que no están en los registros existentes
+                foreach ($colaboraoresIdAgregar as $usersId) {
+                    $detalle = new DetalleGrupoEvaluaciones();
+                    $detalle->colaborador_id = $usersId;
+                    $detalle->grupo_id = $item->id;
+                    $detalle->evaluacion_id = $evaluacion->id;
+                    $detalle->intentos = $item->intentos;
+                    $detalle->habilitado = 'S';
+                    $detalle->save();
+                }
+            }
+            
+            return response()->json([
+                // 'dataDB' => $evaluacion,
+                'success' => true
+            ], 200);
         }
 
-        $evaluacion->nombre = $request->input('nombre');
-        $evaluacion->descripcion = $request->input('descripcion');
-        $evaluacion->calificacionMinima = $request->input('calificacionMinima');
-        $evaluacion->intentos = $request->input('intentos');
-        $evaluacion->save();
-
-        return response()->json([
-            'message' => 'Evaluacion actualizada con éxito',
-            'success' => true
-        ], 200);
     }
 
     public function deshabilitarEvaluacion(Request $request)

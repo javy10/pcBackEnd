@@ -13,9 +13,20 @@ class GrupoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $grupoEvaluaciones = GrupoEvaluaciones::select('grupo_evaluaciones.id', 'grupo_evaluaciones.nombre as nombreG', 'grupo_evaluaciones.apertura', 'grupo_evaluaciones.cierre', 'detalle_grupo_evaluaciones.intentos', 'detalle_grupo_evaluaciones.colaborador_id')
+                            ->join('detalle_grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
+                            ->join('evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
+                            ->where('evaluaciones.id', '=', $request->id)
+                            ->where('grupo_evaluaciones.habilitado', '=', 'S')
+                            ->distinct()
+                            ->get();
+
+        return response()->json([
+            'dataDB' => $grupoEvaluaciones,
+            'success' => true
+        ], 201);
     }
 
     /**
