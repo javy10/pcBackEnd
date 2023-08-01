@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Models\TipoPregunta;
 use Illuminate\Http\Request;
 
-class TipoPreguntaController extends Controller
+class DetallePreguntasRespuestasAbiertasController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,12 +13,7 @@ class TipoPreguntaController extends Controller
      */
     public function index()
     {
-        $tipoPregunta = TipoPregunta::all()->where('habilitado', 'S');
-
-        return response()->json([
-            'dataDB' => $tipoPregunta,
-            'success' => true
-        ]);
+        //
     }
 
     /**
@@ -30,7 +23,7 @@ class TipoPreguntaController extends Controller
      */
     public function create()
     {
-       
+        //
     }
 
     /**

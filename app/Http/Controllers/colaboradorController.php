@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\AuthRequest;
+use App\Models\cargo;
+use App\Models\ConfigDepartamentocargo;
 use App\Models\DetallePermisoMenu;
 use App\Models\PermisoMenu;
 use App\Models\User as User;
@@ -25,14 +27,58 @@ class colaboradorController extends Controller
      */
     public function index()
     {
+        //  $colaborador = DB::table('users')
+        //         ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.email AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos', 'logs_entrada_salidas.fechaSalida')
+        //         ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+        //         ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+        //         ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+        //         ->leftJoin('logs_entrada_salidas', 'logs_entrada_salidas.colaborador_id', '=', 'users.id')
+        //         ->where('users.habilitado', 'S')
+        //         ->get();
+
          $colaborador = DB::table('users')
                 ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.telefono AS telefono', 'users.email AS correo', 'users.dui AS dui', 'users.id AS id', 'users.foto AS foto', 'users.intentos AS intentos', 'logs_entrada_salidas.fechaSalida')
                 ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
-                ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
-                ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+                ->join('config_departamentocargos', 'config_departamentocargos.colaborador_id', '=', 'users.id')
+                ->join('departamentos', 'config_departamentocargos.departamento_id', '=', 'departamentos.id')
+                ->join('cargos', 'config_departamentocargos.cargo_id', '=', 'cargos.id')
                 ->leftJoin('logs_entrada_salidas', 'logs_entrada_salidas.colaborador_id', '=', 'users.id')
                 ->where('users.habilitado', 'S')
                 ->get();
+
+        return response()->json([
+            'dataDB' => $colaborador,
+            'success' => true
+        ]);
+    }
+
+    public function filtroUsuarios(Request $request){
+
+        // $colaborador = DB::table('users')
+        //             ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.id AS id', 'logs_entrada_salidas.fechaSalida')
+        //             ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+        //             ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+        //             ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+        //             ->leftJoin('logs_entrada_salidas', 'logs_entrada_salidas.colaborador_id', '=', 'users.id')
+        //             ->where('users.habilitado', 'S')
+        //             ->where('users.nombres', 'LIKE', '%'.$request->nombre.'%')
+        //             ->orwhere('users.apellidos', 'LIKE', '%'.$request->nombre.'%')
+        //             ->get();
+
+        $colaborador = DB::table('users')
+            ->select('agencias.nombre AS agencia', 'agencias.id AS agencia_id', 'departamentos.nombre AS departamento', 'departamentos.id AS departamento_id', 'cargos.nombre as cargo', 'cargos.id AS cargo_id', 'users.nombres AS nombres', 'users.apellidos AS apellidos', 'users.id AS id', 'logs_entrada_salidas.fechaSalida')
+            ->join('config_departamentocargos', 'config_departamentocargos.colaborador_id', '=', 'users.id')
+            ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+            ->join('departamentos', 'config_departamentocargos.departamento_id', '=', 'departamentos.id')
+            ->join('cargos', 'config_departamentocargos.cargo_id', '=', 'cargos.id')
+            ->leftJoin('logs_entrada_salidas', 'logs_entrada_salidas.colaborador_id', '=', 'users.id')
+            ->where('users.habilitado', 'S')
+            ->where(function ($query) use ($request) {
+                $query->where('users.nombres', 'LIKE', '%'.$request->nombre.'%')
+                      ->orWhere('users.apellidos', 'LIKE', '%'.$request->nombre.'%');
+            })
+            ->get();
+
 
         return response()->json([
             'dataDB' => $colaborador,
@@ -64,41 +110,19 @@ class colaboradorController extends Controller
     public function createColaborador(Request $request)
     {
 
-        // return $request;
+        // return $request->cargo_id;
         // die;
+        
+        // $config = new ConfigDepartamentocargo();
+        // $config->departamento_id = $request->departamento_id;
+        // $config->cargo_id = $request->cargo_id;
+        // $config->colaborador_id = $request->colaborador_id;
+        // $config->habilitado = 'S';
+        // $config->save();
 
-        // echo $request->foto;
-        // echo gettype($request->foto);
-
-        // $file = $request->file('foto');
-        // $fileName = $file->getClientOriginalName();
-        // $filePath = public_path($fileName);
-        // $path = $file->storeAs('public/imagenes', $fileName);
-
-        //  $user = User::create([
-        //     'nombres' => $request->nombres,
-        //     'apellidos' => $request->apellidos,
-        //     'email' => $request->correo,
-        //     'password' => Hash::make($request->password),
-        //     'agencia_id' => $request->agencia_id,
-        //     'departamento_id' => $request->departamento_id,
-        //     'cargo_id' => $request->cargo_id,
-        //     'dui' => $request->dui,
-        //     'telefono' => $request->telefono,
-        //     'intentos' => $request->intentos,
-        //     'habilitado' => $request->habilitado,
-        //     'foto' => $fileName,
-        // ]);
-        // $token = JWTAuth::fromUser($user);
-        //  return response()->json([
-        //      'user' => $user,
-        //      'token' => $token,
-        //      'success' => true
-        //  ], 201);
-
-
-
-
+        // return response()->json([
+        //     'success' => true
+        // ], 201);
 
         // //return $request;
         $file = $request->file('foto');
@@ -108,90 +132,98 @@ class colaboradorController extends Controller
             $filePath = public_path($fileName);
             $path = $file->storeAs('public/imagenes', $fileName);
 
-            $user = User::create([
-                'nombres' => $request->nombres,
-                'apellidos' => $request->apellidos,
-                'email' => $request->correo,
-                'password' => Hash::make($request->password),
-                'agencia_id' => $request->agencia_id,
-                'departamento_id' => $request->departamento_id,
-                'cargo_id' => $request->cargo_id,
-                'dui' => $request->dui,
-                'telefono' => $request->telefono == '' ? null : $request->telefono,
-                'intentos' => $request->intentos,
-                'habilitado' => $request->habilitado,
-                'foto' => $fileName,
-            ]);
+            $user = new User();
+            $user->nombres = $request->nombres;
+            $user->apellidos = $request->apellidos;
+            $user->email = $request->correo;
+            $user->password = Hash::make($request->password);
+            $user->agencia_id = $request->agencia_id;
+            $user->dui = $request->dui;
+            $user->telefono = $request->telefono == '' ? null : $request->telefono;
+            $user->intentos = $request->intentos;
+            $user->habilitado = $request->habilitado;
+            $user->foto = $fileName;
+            $user->save();
             $token = JWTAuth::fromUser($user);
 
-            $permisoMenu = new PermisoMenu();
-            $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
-            $permisoMenu->habilitado = 'S';
-            $permisoMenu->save();
-            
-            $myArray = json_decode($request->menu_id);
-            
-            foreach ($myArray as $item) {
-                echo $item;
-                $detallePermisoMenu = new DetallePermisoMenu();
-                $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
-                $detallePermisoMenu->menu_id = $item;
-                $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
-                $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
-                $detallePermisoMenu->colaborador_id = $user->id;
-                $detallePermisoMenu->habilitado = 'S';
-                $detallePermisoMenu->save();
+            $cargos = json_decode($request->cargo_id);
+            foreach ($cargos as $item) {
+
+                $departamentoId = cargo::where('id', $item)->pluck('departamento_id')->first();
+                $config = new ConfigDepartamentocargo();
+                $config->colaborador_id = $user->id;
+                $config->departamento_id = $departamentoId;
+                $config->cargo_id = $item;
+                $config->habilitado = 'S';
+                $config->save();
+                if($request->menu_id) {
+                    $permisoMenu = new PermisoMenu();
+                    $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+                    $permisoMenu->habilitado = 'S';
+                    $permisoMenu->save();
+
+                    $myArray = json_decode($request->menu_id);
+                    foreach ($myArray as $itemMenu) {
+                        $detallePermisoMenu = new DetallePermisoMenu();
+                        $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                        $detallePermisoMenu->menu_id = $itemMenu;
+                        $detallePermisoMenu->departamento_id = $departamentoId;
+                        $detallePermisoMenu->cargo_id = $item;
+                        $detallePermisoMenu->colaborador_id = $user->id;
+                        $detallePermisoMenu->habilitado = 'S';
+                        $detallePermisoMenu->save();
+                    }    
+                }
             }
-
-
             return response()->json([
-                'user' => $user,
-                'token' => $token,
                 'success' => true
             ], 201);
+
         } else {
-            $user = User::create([
-                'nombres' => $request->nombres,
-                'apellidos' => $request->apellidos,
-                'email' => $request->correo,
-                'password' => Hash::make($request->password),
-                'agencia_id' => $request->agencia_id,
-                'departamento_id' => $request->departamento_id,
-                'cargo_id' => $request->cargo_id,
-                'dui' => $request->dui,
-                'telefono' => $request->telefono == '' ? null : $request->telefono,
-                'intentos' => $request->intentos,
-                'habilitado' => $request->habilitado,
-                'foto' => '',
-            ]);
+            $user = new User();
+            $user->nombres = $request->nombres;
+            $user->apellidos = $request->apellidos;
+            $user->email = $request->correo;
+            $user->password = Hash::make($request->password);
+            $user->agencia_id = $request->agencia_id;
+            $user->dui = $request->dui;
+            $user->telefono = $request->telefono == '' ? null : $request->telefono;
+            $user->intentos = $request->intentos;
+            $user->habilitado = $request->habilitado;
+            $user->save();
             $token = JWTAuth::fromUser($user);
 
-            $permisoMenu = new PermisoMenu();
-            $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
-            $permisoMenu->habilitado = 'S';
-            $permisoMenu->save();
-
-            $myArray = json_decode($request->menu_id);
-            
-            foreach ($myArray as $item) {
-                echo $item;
-                $detallePermisoMenu = new DetallePermisoMenu();
-                $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
-                $detallePermisoMenu->menu_id = $item;
-                $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
-                $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
-                $detallePermisoMenu->colaborador_id = $user->id;
-                $detallePermisoMenu->habilitado = 'S';
-                $detallePermisoMenu->save();
+            $cargos = json_decode($request->cargo_id);
+            foreach ($cargos as $item) {
+                $departamentoId = cargo::where('id', $item)->pluck('departamento_id')->first();
+                $config = new ConfigDepartamentocargo();
+                $config->colaborador_id = $user->id;
+                $config->departamento_id = $departamentoId;
+                $config->cargo_id = $item;
+                $config->habilitado = 'S';
+                $config->save();
+                if($request->menu_id) {
+                    $permisoMenu = new PermisoMenu();
+                    $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+                    $permisoMenu->habilitado = 'S';
+                    $permisoMenu->save();
+                    $myArray = json_decode($request->menu_id);
+                    foreach ($myArray as $itemMenu) {
+                        $detallePermisoMenu = new DetallePermisoMenu();
+                        $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                        $detallePermisoMenu->menu_id = $itemMenu;
+                        $detallePermisoMenu->departamento_id = $departamentoId;
+                        $detallePermisoMenu->cargo_id = $item;
+                        $detallePermisoMenu->colaborador_id = $user->id;
+                        $detallePermisoMenu->habilitado = 'S';
+                        $detallePermisoMenu->save();
+                    }    
+                }
             }
-
             return response()->json([
-                'user' => $user,
-                'token' => $token,
                 'success' => true
             ], 201);
         }
-
     }
 
     public function obtenerFoto(Request $request)
@@ -269,12 +301,38 @@ class colaboradorController extends Controller
         //     'success' => true
         // ]);
 
+        // $user = User::select('nombres', 'apellidos', 'dui', 'telefono', 'email', 'foto', 'agencias.nombre as Agencia', 'agencias.codAgencia', 'agencias.id as agencia_id', 'departamentos.nombre as Departamento', 'departamentos.id as departamento_id', 'cargos.nombre as Cargo', 'cargos.id as cargo_id')
+        //             ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+        //             ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+        //             ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+        //             ->where('users.id', '=', $request->id)
+        //             ->get();
+
         $user = User::select('nombres', 'apellidos', 'dui', 'telefono', 'email', 'foto', 'agencias.nombre as Agencia', 'agencias.codAgencia', 'agencias.id as agencia_id', 'departamentos.nombre as Departamento', 'departamentos.id as departamento_id', 'cargos.nombre as Cargo', 'cargos.id as cargo_id')
+                    ->join('config_departamentocargos', 'config_departamentocargos.colaborador_id', '=', 'users.id')
                     ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
-                    ->join('departamentos', 'users.departamento_id', '=', 'departamentos.id')
-                    ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+                    ->join('departamentos', 'config_departamentocargos.departamento_id', '=', 'departamentos.id')
+                    ->join('cargos', 'config_departamentocargos.cargo_id', '=', 'cargos.id')
                     ->where('users.id', '=', $request->id)
                     ->get();
+
+        return response()->json([
+            'dataDB' => $user,
+            'success' => true
+        ]);
+    }
+
+    public function obtenerPorIDColaborador(Request $request)
+    {
+
+        $user = User::select('users.nombres', 'users.apellidos', 'users.dui', 'users.telefono', 'users.email', 'users.foto', 'agencias.nombre as Agencia', 'agencias.codAgencia', 'agencias.id as agencia_id', 'departamentos.nombre as Departamento', 'departamentos.id as departamento_id', 'cargos.nombre as Cargo', 'cargos.id as cargo_id')
+        ->join('config_departamentocargos', 'config_departamentocargos.colaborador_id', '=', 'users.id')
+        ->join('agencias', 'users.agencia_id', '=', 'agencias.id')
+        ->join('departamentos', 'config_departamentocargos.departamento_id', '=', 'departamentos.id')
+        ->join('cargos', 'config_departamentocargos.cargo_id', '=', 'cargos.id')
+        ->where('users.id', '=', $request->id)
+        ->get();
+
         return response()->json([
             'dataDB' => $user,
             'success' => true
@@ -327,7 +385,7 @@ class colaboradorController extends Controller
             'habilitado' => 'N'
         ]);
         return response()->json([
-            'dataDB' => $colaborador,
+            // 'dataDB' => $colaborador,
             'success' => true
         ]);
     }
@@ -438,15 +496,16 @@ class colaboradorController extends Controller
      */
     public function update(Request $request)
     {
+        // return $request->id;
+        // die;
 
-        //return $request;
+
         $file = $request->file('foto');
         if($file != null || $file != '') 
         {
             $fileName = $file->getClientOriginalName();
             $filePath = public_path($fileName);
             $path = $file->storeAs('public/imagenes', $fileName);
-
             $user = User::find($request->id);
             $user->update([
                 'foto' => $fileName,
@@ -454,15 +513,126 @@ class colaboradorController extends Controller
                 'nombres' => $request->nombres,
                 'apellidos' => $request->apellidos,
                 'agencia_id' => $request->agencia_id,
-                'departamento_id' => $request->departamento_id,
-                'cargo_id' => $request->cargo_id,
                 'telefono' => $request->telefono,
-                'email' => $request->email,
+                'email' => $request->correo,
             ]);
-            return response()->json([
-                'dataDB' => $user,
-                'success' => true
-            ]);
+
+            //  PARA ACTUALIZAR LOS DATOS DEL MENU EN LA TABLA DE DETALLE PERMISO MENU
+            // Paso 1: Obtener los nuevos usuarios_id
+            $nuevosPermisosMenuId = $request->input('menu_id');
+            $cadenas = $nuevosPermisosMenuId;
+            $arrayMenu = explode(',', $cadenas);
+            $arrayMenu = array_map(function($value) {
+                return intval(trim($value, "[]"));
+            }, $arrayMenu);
+
+            // return $arrayMenu;
+            // die;
+
+            // Paso 2: Recuperar los registros existentes
+            $registrosExistentePermisoMenu = DetallePermisoMenu::where('colaborador_id', $request->id)->get();
+            // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+            $cargoIdExistente = $registrosExistentePermisoMenu->pluck('menu_id')->toArray();
+            $cargosIdEliminar = array_diff($cargoIdExistente, $arrayMenu);
+            $cargosIdAgregar = array_diff($arrayMenu, $cargoIdExistente);
+
+            // return $cargosIdAgregar;
+            // die;
+
+            if(!empty($cargosIdEliminar)){
+                //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+                DetallePermisoMenu::where('colaborador_id', $request->id)
+                ->whereIn('menu_id', $cargosIdEliminar)
+                ->delete();
+                //->update(['habilitado' => 'N']);
+            }
+            // Paso 1: Obtener los nuevos usuarios_id
+            $nuevosPermisosUserId = $request->input('cargo_id');
+            $cadenas = $nuevosPermisosUserId;
+            $array = explode(',', $cadenas);
+            $array = array_map(function($value) {
+                return intval(trim($value, "[]"));
+            }, $array);
+            // Paso 2: Recuperar los registros existentes
+            $registrosExistente = ConfigDepartamentocargo::where('colaborador_id', $request->id)->get();
+            // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+            $colaboradoresIdExistente = $registrosExistente->pluck('cargo_id')->toArray();
+            $colaboradoresIdEliminar = array_diff($colaboradoresIdExistente, $array);
+            $colaboraoresIdAgregar = array_diff($array, $colaboradoresIdExistente);
+            //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+            // ConfigDepartamentocargo::where('colaborador_id', $request->id)
+            // ->whereIn('cargo_id', $colaboradoresIdEliminar)
+            // ->delete();
+            if(!empty($colaboradoresIdEliminar)){
+                ConfigDepartamentocargo::where('colaborador_id', $request->id)
+                ->whereIn('cargo_id', $colaboradoresIdEliminar)
+                ->delete();
+                //->update(['habilitado' => 'N']);
+            }
+            // return $registrosExistente;
+            // die;
+            if($colaboraoresIdAgregar) {
+                // Paso 5: Agregar los nuevos registros para los usuarios_id que no están en los registros existentes
+                foreach ($colaboraoresIdAgregar as $item) {
+                    $departamentoId = cargo::where('id', $item)->pluck('departamento_id')->first();
+                    $config = new ConfigDepartamentocargo();
+                    $config->colaborador_id = $user->id;
+                    $config->departamento_id = $departamentoId;
+                    $config->cargo_id = $item;
+                    $config->habilitado = 'S';
+                    $config->save();
+
+                    $permisoMenu = new PermisoMenu();
+                    $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+                    $permisoMenu->habilitado = 'S';
+                    $permisoMenu->save();
+
+                    if(!empty(array_diff($cargosIdAgregar, [0]))){
+                        foreach ($cargosIdAgregar as $itemMenu) {
+                            $detallePermisoMenu = new DetallePermisoMenu();
+                            $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                            $detallePermisoMenu->menu_id = $itemMenu;
+                            $detallePermisoMenu->departamento_id = $departamentoId;
+                            $detallePermisoMenu->cargo_id = $item;
+                            $detallePermisoMenu->colaborador_id = $user->id;
+                            $detallePermisoMenu->habilitado = 'S';
+                            $detallePermisoMenu->save();
+                        }  
+                    }
+                }
+                return response()->json([
+                    // 'dataDB' => $user,
+                    'success' => true
+                ]);
+            }
+             else {
+                foreach ($colaboradoresIdExistente as $item) {
+                    // return $cargosIdAgregar;
+                    // die;
+                    if(!empty(array_diff($cargosIdAgregar, [0]))){
+                        $departamentoId = cargo::where('id', $item)->pluck('departamento_id')->first();
+                        $permisoMenu = new PermisoMenu();
+                        $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+                        $permisoMenu->habilitado = 'S';
+                        $permisoMenu->save();
+                        //$myArray = json_decode($request->menu_id);
+                        foreach ($cargosIdAgregar as $itemMenu) {
+                            $detallePermisoMenu = new DetallePermisoMenu();
+                            $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                            $detallePermisoMenu->menu_id = $itemMenu;
+                            $detallePermisoMenu->departamento_id = $departamentoId;
+                            $detallePermisoMenu->cargo_id = $item;
+                            $detallePermisoMenu->colaborador_id = $user->id;
+                            $detallePermisoMenu->habilitado = 'S';
+                            $detallePermisoMenu->save();
+                        }  
+                    }
+                }
+                return response()->json([
+                    // 'dataDB' => $user,
+                    'success' => true
+                ]);
+            }
         } else {
             $user = User::find($request->id);
             $user->update([
@@ -470,16 +640,138 @@ class colaboradorController extends Controller
                 'nombres' => $request->nombres,
                 'apellidos' => $request->apellidos,
                 'agencia_id' => $request->agencia_id,
-                'departamento_id' => $request->departamento_id,
-                'cargo_id' => $request->cargo_id,
                 'telefono' => $request->telefono,
-                'email' => $request->email,
+                'email' => $request->correo,
             ]);
 
-            return response()->json([
-                'dataDB' => $user,
-                'success' => true
-            ]);
+            //  PARA ACTUALIZAR LOS DATOS DEL MENU EN LA TABLA DE DETALLE PERMISO MENU
+            // Paso 1: Obtener los nuevos usuarios_id
+            $nuevosPermisosMenuId = $request->input('menu_id');
+            $cadenas = $nuevosPermisosMenuId;
+            $arrayMenu = explode(',', $cadenas);
+            $arrayMenu = array_map(function($value) {
+                return intval(trim($value, "[]"));
+            }, $arrayMenu);
+
+            // return $arrayMenu;
+            // die;
+
+            // Paso 2: Recuperar los registros existentes
+            $registrosExistentePermisoMenu = DetallePermisoMenu::where('colaborador_id', $request->id)->get();
+            // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+            $cargoIdExistente = $registrosExistentePermisoMenu->pluck('menu_id')->toArray();
+            $cargosIdEliminar = array_diff($cargoIdExistente, $arrayMenu);
+            $cargosIdAgregar = array_diff($arrayMenu, $cargoIdExistente);
+
+            // return $cargosIdAgregar;
+            // die;
+
+            if(!empty($cargosIdEliminar)){
+                //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+                DetallePermisoMenu::where('colaborador_id', $request->id)
+                ->whereIn('menu_id', $cargosIdEliminar)
+                ->delete();
+                //->update(['habilitado' => 'N']);
+            }
+            // Paso 1: Obtener los nuevos usuarios_id
+            $nuevosPermisosUserId = $request->input('cargo_id');
+            $cadenas = $nuevosPermisosUserId;
+            $array = explode(',', $cadenas);
+            $array = array_map(function($value) {
+                return intval(trim($value, "[]"));
+            }, $array);
+            // Paso 2: Recuperar los registros existentes
+            $registrosExistente = ConfigDepartamentocargo::where('colaborador_id', $request->id)->get();
+            // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+            $colaboradoresIdExistente = $registrosExistente->pluck('cargo_id')->toArray();
+            $colaboradoresIdEliminar = array_diff($colaboradoresIdExistente, $array);
+            $colaboraoresIdAgregar = array_diff($array, $colaboradoresIdExistente);
+            //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+            // ConfigDepartamentocargo::where('colaborador_id', $request->id)
+            // ->whereIn('cargo_id', $colaboradoresIdEliminar)
+            // ->delete();
+            if(!empty($colaboradoresIdEliminar)){
+                ConfigDepartamentocargo::where('colaborador_id', $request->id)
+                ->whereIn('cargo_id', $colaboradoresIdEliminar)
+                ->delete();
+                //->update(['habilitado' => 'N']);
+            }
+            // return $registrosExistente;
+            // die;
+
+            if($colaboraoresIdAgregar) {
+                // Paso 5: Agregar los nuevos registros para los usuarios_id que no están en los registros existentes
+                foreach ($colaboraoresIdAgregar as $item) {
+    
+                    $departamentoId = cargo::where('id', $item)->pluck('departamento_id')->first();
+                    $config = new ConfigDepartamentocargo();
+                    $config->colaborador_id = $user->id;
+                    $config->departamento_id = $departamentoId;
+                    $config->cargo_id = $item;
+                    $config->habilitado = 'S';
+                    $config->save();
+
+                    $permisoMenu = new PermisoMenu();
+                    $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+                    $permisoMenu->habilitado = 'S';
+                    $permisoMenu->save();
+        
+                    if(!empty(array_diff($cargosIdAgregar, [0]))){
+                        foreach ($cargosIdAgregar as $itemMenu) {
+                            $detallePermisoMenu = new DetallePermisoMenu();
+                            $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                            $detallePermisoMenu->menu_id = $itemMenu;
+                            $detallePermisoMenu->departamento_id = $departamentoId;
+                            $detallePermisoMenu->cargo_id = $item;
+                            $detallePermisoMenu->colaborador_id = $user->id;
+                            $detallePermisoMenu->habilitado = 'S';
+                            $detallePermisoMenu->save();
+                        }  
+                    }
+                }
+
+                return response()->json([
+                    // 'dataDB' => $user,
+                    'success' => true
+                ]);
+
+            }
+             else {
+
+                foreach ($colaboradoresIdExistente as $item) {
+
+                    // return $cargosIdAgregar;
+                    // die;
+
+                    if(!empty(array_diff($cargosIdAgregar, [0]))){
+                        $departamentoId = cargo::where('id', $item)->pluck('departamento_id')->first();
+    
+                        $permisoMenu = new PermisoMenu();
+                        $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+                        $permisoMenu->habilitado = 'S';
+                        $permisoMenu->save();
+            
+                        //$myArray = json_decode($request->menu_id);
+            
+                        foreach ($cargosIdAgregar as $itemMenu) {
+                            $detallePermisoMenu = new DetallePermisoMenu();
+                            $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                            $detallePermisoMenu->menu_id = $itemMenu;
+                            $detallePermisoMenu->departamento_id = $departamentoId;
+                            $detallePermisoMenu->cargo_id = $item;
+                            $detallePermisoMenu->colaborador_id = $user->id;
+                            $detallePermisoMenu->habilitado = 'S';
+                            $detallePermisoMenu->save();
+                        }  
+                    }
+                }
+                return response()->json([
+                    // 'dataDB' => $user,
+                    'success' => true
+                ]);
+            }
+
+
         }
 
     }

@@ -58,22 +58,64 @@ class DocumentoController extends Controller
         $documento->tipoDocumento_id = $request->tipoDocumento_id;
         $documento->save();
 
-        $permiso = new Permiso();
-        $permiso->tipoPermiso_id = $request->tipoPermiso_id;
-        $permiso->habilitado = 'S';
-        $permiso->save();
-
-        $myArray = json_decode($request->colaborador_id);
-            
-        foreach ($myArray as $item) {
-            $detallePermiso = new DetallePermiso();
-            $detallePermiso->colaborador_id = $item;
-            $detallePermiso->departamento_id =  null;
-            $detallePermiso->documento_id = $documento->id;
-            $detallePermiso->permiso_id = $permiso->id;
-            $detallePermiso->habilitado = 'S';
-            $detallePermiso->save();
+        if($request->colaborador_id) {
+            $permiso = new Permiso();
+            $permiso->tipoPermiso_id = $request->tipoPermiso_id;
+            $permiso->habilitado = 'S';
+            $permiso->save();
+    
+            $myArray = json_decode($request->colaborador_id);
+                
+            foreach ($myArray as $item) {
+                $detallePermiso = new DetallePermiso();
+                $detallePermiso->colaborador_id = $item;
+                $detallePermiso->departamento_id =  null;
+                $detallePermiso->cargo_id =  null;
+                $detallePermiso->documento_id = $documento->id;
+                $detallePermiso->permiso_id = $permiso->id;
+                $detallePermiso->habilitado = 'S';
+                $detallePermiso->save();
+            }
         }
+        if($request->departamento_id) {
+            $permiso = new Permiso();
+            $permiso->tipoPermiso_id = $request->tipoPermisoD_id;
+            $permiso->habilitado = 'S';
+            $permiso->save();
+    
+            $myArrayD = json_decode($request->departamento_id);
+                
+            foreach ($myArrayD as $item) {
+                $detallePermiso = new DetallePermiso();
+                $detallePermiso->colaborador_id = null;
+                $detallePermiso->departamento_id =  $item;
+                $detallePermiso->cargo_id =  null;
+                $detallePermiso->documento_id = $documento->id;
+                $detallePermiso->permiso_id = $permiso->id;
+                $detallePermiso->habilitado = 'S';
+                $detallePermiso->save();
+            }
+        }
+        if($request->cargo_id) {
+            $permiso = new Permiso();
+            $permiso->tipoPermiso_id = $request->tipoPermisoC_id;
+            $permiso->habilitado = 'S';
+            $permiso->save();
+    
+            $myArrayC = json_decode($request->cargo_id);
+                
+            foreach ($myArrayC as $item) {
+                $detallePermiso = new DetallePermiso();
+                $detallePermiso->colaborador_id = null;
+                $detallePermiso->departamento_id =  null;
+                $detallePermiso->cargo_id =  $item;
+                $detallePermiso->documento_id = $documento->id;
+                $detallePermiso->permiso_id = $permiso->id;
+                $detallePermiso->habilitado = 'S';
+                $detallePermiso->save();
+            }
+        }
+
 
 
         return response()->json([
@@ -157,7 +199,7 @@ class DocumentoController extends Controller
                         ->join('permisos', 'detalle_permisos.permiso_id', '=', 'permisos.id')
                         ->join('tipo_documentos', 'documentos.tipoDocumento_id', '=', 'tipo_documentos.id')
                         ->distinct()
-                        ->select('documentos.id', 'documentos.titulo', 'tipo_documentos.tipo', 'documentos.tipoDocumento_id', 'documentos.created_at')
+                        ->select('documentos.id', 'documentos.titulo', 'tipo_documentos.tipo', 'documentos.tipoDocumento_id', 'documentos.created_at', 'documentos.colaborador_id')
                         ->where('detalle_archivo_documentos.disponible', '=', 'S')
                         ->where('detalle_archivo_documentos.lectura', '=', 'S')
                         ->where('detalle_archivo_documentos.habilitado', '=', 'S')

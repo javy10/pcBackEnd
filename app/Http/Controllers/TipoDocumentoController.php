@@ -38,10 +38,16 @@ class TipoDocumentoController extends Controller
                 ->join('detalle_permisos', 'detalle_permisos.documento_id', '=', 'documentos.id')
                 ->select('tipo_documentos.tipo', 'tipo_documentos.id')
                 ->distinct()
-                ->where(function ($query) use ($request) 
-                {
+                // ->where(function ($query) use ($request) 
+                // {
+                //     $query->where('detalle_permisos.colaborador_id', '=', $request->idC)
+                //         ->orWhereIn('detalle_permisos.departamento_id', '=', $request->idD)
+                //         ->orWhereIn('detalle_permisos.departamento_id', '=', $request->idCa);
+                // })
+                ->where(function ($query) use ($request) {
                     $query->where('detalle_permisos.colaborador_id', '=', $request->idC)
-                        ->orWhere('detalle_permisos.departamento_id', '=', $request->idD);
+                          ->orWhereIn('detalle_permisos.departamento_id', $request->idD)
+                          ->orWhereIn('detalle_permisos.cargo_id', $request->idCa);
                 })
                 ->where('detalle_archivo_documentos.disponible', '=', 'S')
                 ->where('detalle_archivo_documentos.habilitado', '=', 'S')

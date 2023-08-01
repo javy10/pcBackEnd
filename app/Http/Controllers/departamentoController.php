@@ -23,9 +23,17 @@ class departamentoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $depart = new departamento();
+        $depart->nombre = $request->nombre;
+        $depart->habilitado = 'S';
+        $depart->save();
+
+        return response()->json([
+            // 'dataDB' => $user,
+            'success' => true
+        ]);
     }
 
     /**

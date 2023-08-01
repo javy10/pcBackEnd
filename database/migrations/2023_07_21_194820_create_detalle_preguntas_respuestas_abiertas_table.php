@@ -13,19 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('detalle_grupo_evaluaciones', function (Blueprint $table) {
+        Schema::create('detalle_preguntas_respuestas_abiertas', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('grupo_id');
             $table->unsignedBigInteger('evaluacion_id');
-            $table->unsignedBigInteger('colaborador_id');
-            $table->char('intentos');
-            $table->char('finalizada');
+            $table->unsignedBigInteger('pregunta_id');
+            $table->unsignedBigInteger('respuesta_id');
             $table->char('habilitado');
             $table->timestamps();
 
-            $table->foreign('grupo_id')->references('id')->on('grupo_evaluaciones')->onDelete('cascade');
             $table->foreign('evaluacion_id')->references('id')->on('evaluaciones')->onDelete('cascade');
-            $table->foreign('colaborador_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('pregunta_id')->references('id')->on('preguntas')->onDelete('cascade');
+            $table->foreign('respuesta_id')->references('id')->on('respuestas')->onDelete('cascade');
         });
     }
 
@@ -36,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('detalle_grupo_evaluaciones');
+        Schema::dropIfExists('detalle_preguntas_respuestas_abiertas');
     }
 };

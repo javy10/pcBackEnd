@@ -26,15 +26,32 @@ class DetalleEvaluacionPreguntaController extends Controller
                         ->join('evaluaciones as e', 'dep.evaluacion_id', '=', 'e.id')
                         ->join('detalle_grupo_evaluaciones as dge', 'e.id', '=', 'dge.evaluacion_id')
                         ->join('grupo_evaluaciones as g', 'dge.grupo_id', '=', 'g.id')
-                        ->select('p.id', 'p.valorPregunta', 'r.id as respuesta_id', 'r.valorRespuesta', 'p.tipoPregunta_id', 'e.id as evaluacion_id', 'e.nombre' )
+                        ->select('p.id', 'p.valorPregunta', 'r.id as respuesta_id', 'r.valorRespuesta', 'p.tipoPregunta_id', 'e.id as evaluacion_id', 'e.nombre', 'e.evaluada', 'g.apertura', 'g.cierre')
                         ->distinct()
                         ->where('g.habilitado', '=', 'S')
                         ->where('e.habilitado', '=', 'S')
+                        ->where('p.habilitado', '=', 'S')
                         // ->where('r.respuestaCorrecta', '=', 1)
                         ->where('dge.colaborador_id', '=', $request->colaborador_id)
                         ->where('e.id', '=', $request->evaluacion_id)
                         // ->groupBy('p.valorPregunta')
                         ->get();
+
+        // $resultados = DB::table('preguntas as p')
+        //                 ->join('detalle_evaluacion_preguntas as dep', 'p.id', '=', 'dep.pregunta_id')
+        //                 ->join('evaluaciones as e', 'dep.evaluacion_id', '=', 'e.id')
+        //                 ->join('detalle_grupo_evaluaciones as dge', 'e.id', '=', 'dge.evaluacion_id')
+        //                 ->join('grupo_evaluaciones as g', 'dge.grupo_id', '=', 'g.id')
+        //                 ->select('p.id', 'p.valorPregunta', 'p.tipoPregunta_id', 'e.id as evaluacion_id', 'e.nombre', 'e.evaluada', 'g.apertura', 'g.cierre')
+        //                 ->distinct()
+        //                 ->where('g.habilitado', '=', 'S')
+        //                 ->where('e.habilitado', '=', 'S')
+        //                 ->where('p.habilitado', '=', 'S')
+        //                 // ->where('r.respuestaCorrecta', '=', 1)
+        //                 ->where('dge.colaborador_id', '=', $request->colaborador_id)
+        //                 ->where('e.id', '=', $request->evaluacion_id)
+        //                 // ->groupBy('p.valorPregunta')
+        //                 ->get();
 
         return response()->json([
             'dataDB' => $resultados,
@@ -60,10 +77,11 @@ class DetalleEvaluacionPreguntaController extends Controller
      */
     public function store(Request $request)
     {
-        $resultados = DetalleEvaluacionPregunta::select('detalle_evaluacion_preguntas.evaluacion_id', 'preguntas.valorPregunta', 'preguntas.tipoPregunta_id', 'respuestas.valorRespuesta')
+        $resultados = DetalleEvaluacionPregunta::select('detalle_evaluacion_preguntas.evaluacion_id', 'preguntas.id', 'preguntas.valorPregunta', 'preguntas.tipoPregunta_id', 'respuestas.id as respuesta_id', 'respuestas.valorRespuesta')
                                                 ->join('preguntas', 'detalle_evaluacion_preguntas.pregunta_id', '=', 'preguntas.id')
                                                 ->join('detalle_pregunta_respuestas', 'detalle_pregunta_respuestas.pregunta_id', '=', 'preguntas.id')
                                                 ->join('respuestas', 'detalle_pregunta_respuestas.respuesta_id', '=', 'respuestas.id')
+                                                ->where('preguntas.habilitado', '=', 'S')
                                                 ->where('detalle_evaluacion_preguntas.evaluacion_id', '=', $request->id)
                                                 ->get();
 

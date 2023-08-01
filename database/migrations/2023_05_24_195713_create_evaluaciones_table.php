@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('calificacionMinima');
             $table->integer('cantidadPreguntas')->nullable();
             $table->char('intentos');
+            $table->char('evaluada');
             $table->char('habilitado');
             $table->timestamps();
         });

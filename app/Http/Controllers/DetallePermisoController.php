@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DetallePermiso;
+use App\Models\Permiso;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -47,7 +48,7 @@ class DetallePermisoController extends Controller
     public function store(Request $request)
     {
         $colaborador_permisos = DB::table('detalle_permisos')
-                    ->select('colaborador_id')
+                    ->select('colaborador_id', 'departamento_id', 'cargo_id')
                     ->where('documento_id', '=', $request->id)
                     ->get();
         return response()->json([
@@ -146,61 +147,143 @@ class DetallePermisoController extends Controller
      */
     public function update(Request $request)
     {
-        // if($request->id) {
-        //     $documento = DetallePermiso::find($request->id);
-        //     $documento->update([
-        //         'permiso_id' => $request->permiso_id,
-        //         'documento_id' => $request->documento_id,
-        //         'departamento_id' => $request->departamento_id,
-        //         'colaborador_id' => $request->colaborador_id,
-        //         'updated_at' => $request->fechaRegistro,
-        //         // 'habilitado' => 'S',
-
-        //         // 'permiso_id': this.idP,
-        //         // 'documento_id': this.idD,
-        //         // 'tipoPermiso_id': tipo.value,
-        //         // 'departamento_id': idDepar,
-        //         // 'colaborador_id': idColab,
-        //         // 'fechaRegistro': today,
-        //     ]);
-        // }
 
         if($request->documento_id) {
             // Paso 1: Obtener los nuevos usuarios_id
+            $nuevosPermisosDepartId = $request->input('departamento_id');
+            $cadenasD = $nuevosPermisosDepartId;
+            $arrayD = explode(',', $cadenasD);
+            $numerosD = array_map('intval', $arrayD);
+//************************************************************************************************************* */
+            // Paso 1: Obtener los nuevos usuarios_id
+            $nuevosPermisosCargoId = $request->input('cargo_id');
+            $cadenasC = $nuevosPermisosCargoId;
+            $arrayC = explode(',', $cadenasC);
+            $numerosC = array_map('intval', $arrayC);
+ //************************************************************************************************************* */
+            // Paso 1: Obtener los nuevos usuarios_id
             $nuevosPermisosUserId = $request->input('colaborador_id');
-            
             $cadenas = $nuevosPermisosUserId;
             $array = explode(',', $cadenas);
             $numeros = array_map('intval', $array);
-
+ //************************************************************************************************************* */
             // Paso 2: Recuperar los registros existentes
             $registrosExistente = DetallePermiso::where('documento_id', $request->documento_id)->get();
-        
+            
+            //************************************************************************************************************* */
             // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
-            $colaboradoresIdExistente = $registrosExistente->pluck('colaborador_id')->toArray();
-            $colaboradoresIdEliminar = array_diff($colaboradoresIdExistente, $numeros);
-            $colaboraoresIdAgregar = array_diff($numeros, $colaboradoresIdExistente);
+            $departamentosIdExistente = $registrosExistente->pluck('departamento_id')->toArray();
+            $filteredArrayD = array_filter($departamentosIdExistente, function ($value) {
+                return $value !== null;
+            });
+            $departamentosIdEliminar = array_diff($filteredArrayD, $numerosD);
+            $departamentosIdAgregar = array_diff($numerosD, $filteredArrayD);
+
+            // return $registrosExistente;
+            // die;
 
             //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
-            DetallePermiso::where('documento_id', $request->documento_id)
-                            ->whereIn('colaborador_id', $colaboradoresIdEliminar)
-                            ->delete();
+            if(!empty($departamentosIdEliminar)){
+                DetallePermiso::where('documento_id', $request->documento_id)
+                                ->whereIn('departamento_id', $departamentosIdEliminar)
+                                ->delete();
+            }
+            //************************************************************************************************************* */
+            // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+            $cargosIdExistente = $registrosExistente->pluck('cargo_id')->toArray();
+            $filteredArrayC = array_filter($cargosIdExistente, function ($value) {
+                return $value !== null;
+            });
+            $cargosIdEliminar = array_diff($filteredArrayC, $numerosC);
+            $cargosIdAgregar = array_diff($numerosC, $filteredArrayC);
+            //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+            if(!empty($cargosIdEliminar)){
+                DetallePermiso::where('documento_id', $request->documento_id)
+                                ->whereIn('cargo_id', $cargosIdEliminar)
+                                ->delete();
+            }
+            //************************************************************************************************************* */
+            // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+            $colaboradoresIdExistente = $registrosExistente->pluck('colaborador_id')->toArray();
+            $filteredArray = array_filter($colaboradoresIdExistente, function ($value) {
+                return $value !== null;
+            });
+            $colaboradoresIdEliminar = array_diff($filteredArray, $numeros);
+            $colaboraoresIdAgregar = array_diff($numeros, $filteredArray);
+            //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+            if(!empty($colaboradoresIdEliminar)){
+                DetallePermiso::where('documento_id', $request->documento_id)
+                                ->whereIn('colaborador_id', $colaboradoresIdEliminar)
+                                ->delete();
+            }
+            //************************************************************************************************************* */   
+
+            //return $departamentosIdAgregar;
+            //return $cargosIdAgregar;
+            //return $colaboraoresIdAgregar;
+            //die;
 
             // Paso 5: Agregar los nuevos registros para los usuarios_id que no están en los registros existentes
-            foreach ($colaboraoresIdAgregar as $usersId) {
-                $detalle = new DetallePermiso();
-                $detalle->colaborador_id = $usersId;
-                $detalle->departamento_id = null;
-                $detalle->documento_id = $request->documento_id;
-                $detalle->permiso_id = $registrosExistente[0]->permiso_id;
-                $detalle->habilitado = 'S';
-                $detalle->save();
-            }
+            if(!empty(array_diff($departamentosIdAgregar, [0]))) {
 
+                // return 'entro';
+                // die;
+
+                $permiso = new Permiso();
+                $permiso->tipoPermiso_id = $request->tipoPermisoD_id;
+                $permiso->habilitado = 'S';
+                $permiso->save();
+                foreach ($departamentosIdAgregar as $departamentoId) {
+                    $detalle = new DetallePermiso();
+                    $detalle->departamento_id = $departamentoId;
+                    $detalle->cargo_id = null;
+                    $detalle->colaborador_id = null;
+                    $detalle->documento_id = $request->documento_id;
+                    //$detalle->permiso_id = $registrosExistente[0]->permiso_id;
+                    $detalle->permiso_id = $permiso->id;
+                    $detalle->habilitado = 'S';
+                    $detalle->save();
+                }
+            }
+            if(!empty(array_diff($cargosIdAgregar, [0]))) {
+                $permiso = new Permiso();
+                $permiso->tipoPermiso_id = $request->tipoPermisoC_id;
+                $permiso->habilitado = 'S';
+                $permiso->save();
+                foreach ($cargosIdAgregar as $cargoId) {
+                    $detalle = new DetallePermiso();
+                    $detalle->departamento_id = null;
+                    $detalle->cargo_id = $cargoId;
+                    $detalle->colaborador_id = null;
+                    $detalle->documento_id = $request->documento_id;
+                    // $detalle->permiso_id = $registrosExistente[0]->permiso_id;
+                    $detalle->permiso_id = $permiso->id;
+                    $detalle->habilitado = 'S';
+                    $detalle->save();
+                }
+            }
+            if(!empty(array_diff($colaboraoresIdAgregar, [0]))) {
+                $permiso = new Permiso();
+                $permiso->tipoPermiso_id = $request->tipoPermiso_id;
+                $permiso->habilitado = 'S';
+                $permiso->save();
+                foreach ($colaboraoresIdAgregar as $usersId) {
+                    $detalle = new DetallePermiso();
+                    $detalle->departamento_id = null;
+                    $detalle->cargo_id = null;
+                    $detalle->colaborador_id = $usersId;
+                    $detalle->documento_id = $request->documento_id;
+                    // $detalle->permiso_id = $registrosExistente[0]->permiso_id;
+                    $detalle->permiso_id = $permiso->id;
+                    $detalle->habilitado = 'S';
+                    $detalle->save();
+                }
+            }
             return response()->json([
                 'success' => true
             ], 201);
         }
+        
     }
 
     /**

@@ -20,10 +20,18 @@ class DetallePermisoMenuController extends Controller
         // return $request->id;
         // die;
 
-        // $detallePermiso = DetallePermisoMenu::where('habilitado', 'S')
-        //                 ->where('detalle_permiso_menus.colaborador_id', '=', $request->id)
-        //                 ->orwhere('detalle_permiso_menus.departamento_id', '=', $request->idDepart)
-        //                 ->get();
+        // $detallePermiso = DB::table('detalle_permiso_menus')
+        //     ->join('menus', 'detalle_permiso_menus.menu_id', '=', 'menus.id')
+        //     ->leftJoin('departamentos','detalle_permiso_menus.departamento_id','=','departamentos.id')
+        //     ->leftJoin('cargos','detalle_permiso_menus.cargo_id','=','cargos.id')
+        //     ->join('permiso_menus','detalle_permiso_menus.permisoMenu_id','=','permiso_menus.id')
+        //     ->leftJoin('users','detalle_permiso_menus.colaborador_id','=','users.id')
+        //     ->select('detalle_permiso_menus.id as idConfig', 'detalle_permiso_menus.colaborador_id','users.nombres','users.apellidos','detalle_permiso_menus.cargo_id', 'cargos.nombre','detalle_permiso_menus.menu_id', 'menus.nombre as menu', 'detalle_permiso_menus.permisoMenu_id', 'detalle_permiso_menus.habilitado', 'detalle_permiso_menus.departamento_id', 'detalle_permiso_menus.created_at as fechaRegistro')
+        //     ->where('detalle_permiso_menus.habilitado','=','S')
+        //     ->where('detalle_permiso_menus.colaborador_id', '=', $request->id)
+        //     ->orwhere('detalle_permiso_menus.departamento_id', '=', $request->idDepart)
+        //     // ->where('detalle_permiso_menus.menu_id', '=', $request->menu_id)
+        //     ->get();
         // return $detallePermiso;
 
         $detallePermiso = DB::table('detalle_permiso_menus')
@@ -32,13 +40,16 @@ class DetallePermisoMenuController extends Controller
             ->leftJoin('cargos','detalle_permiso_menus.cargo_id','=','cargos.id')
             ->join('permiso_menus','detalle_permiso_menus.permisoMenu_id','=','permiso_menus.id')
             ->leftJoin('users','detalle_permiso_menus.colaborador_id','=','users.id')
-            ->select('detalle_permiso_menus.id as idConfig', 'detalle_permiso_menus.colaborador_id','users.nombres','users.apellidos','detalle_permiso_menus.cargo_id', 'cargos.nombre','detalle_permiso_menus.menu_id', 'menus.nombre as menu', 'detalle_permiso_menus.permisoMenu_id', 'detalle_permiso_menus.habilitado', 'detalle_permiso_menus.departamento_id', 'detalle_permiso_menus.created_at as fechaRegistro')
+            ->select('detalle_permiso_menus.id as idConfig', 'detalle_permiso_menus.colaborador_id', 'detalle_permiso_menus.cargo_id', 'detalle_permiso_menus.menu_id', 'detalle_permiso_menus.permisoMenu_id', 'detalle_permiso_menus.departamento_id')
             ->where('detalle_permiso_menus.habilitado','=','S')
             ->where('detalle_permiso_menus.colaborador_id', '=', $request->id)
             ->orwhere('detalle_permiso_menus.departamento_id', '=', $request->idDepart)
             // ->where('detalle_permiso_menus.menu_id', '=', $request->menu_id)
             ->get();
-        return $detallePermiso;
+
+            $menuIds = $detallePermiso->pluck('menu_id')->unique();
+
+        return $menuIds;
 
     }
 
@@ -134,9 +145,9 @@ class DetallePermisoMenuController extends Controller
         $menu = DetallePermisoMenu::select('menu_id')
                                 ->where('colaborador_id', '=', $id)
                                 ->where('habilitado', '=', 'S')
+                                ->distinct()
                                 ->get();
         return response()->json([
-            
             'dataDB' => $menu,
             'success' => true
         ], 201);
@@ -151,75 +162,79 @@ class DetallePermisoMenuController extends Controller
     public function edit(Request $request)
     {
 
-        // Paso 1: Obtener los nuevos usuarios_id
-        $nuevosMenusId = $request->input('menu_id');
-        //$nuevosMenusId = $myArray;
-        $cadenas = $nuevosMenusId;
-        $array = explode(',', $cadenas);
-        $numeros = array_map('intval', $array);
+        if($request->menu_id) {
 
-        // Paso 2: Recuperar los registros existentes
-        $registrosExistente = DetallePermisoMenu::where('colaborador_id', $request->id)->get();
-     
-        // return $registrosExistente;
-        // die;
-
-        if(count($registrosExistente) != 0) {
-            ////echo 'Contiene';
-            // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
-            $menusIdExistente = $registrosExistente->pluck('menu_id')->toArray();
-            $menusIdEliminar = array_diff($menusIdExistente, $numeros);
-            $menusIdAgregar = array_diff($numeros, $menusIdExistente);
+            // Paso 1: Obtener los nuevos usuarios_id
+            $nuevosMenusId = $request->input('menu_id');
+            //$nuevosMenusId = $myArray;
+            $cadenas = $nuevosMenusId;
+            $array = explode(',', $cadenas);
+            $numeros = array_map('intval', $array);
     
-            //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
-            DetallePermisoMenu::where('colaborador_id', $request->id)
-                            ->whereIn('menu_id', $menusIdEliminar)
-                            ->delete();
+            // Paso 2: Recuperar los registros existentes
+            $registrosExistente = DetallePermisoMenu::where('colaborador_id', $request->id)->get();
+         
+            // return $registrosExistente;
+            // die;
     
-            // Paso 5: Agregar los nuevos registros para los usuarios_id que no están en los registros existentes
-            foreach ($menusIdAgregar as $menusId) {
-                $detallePermisoMenu = new DetallePermisoMenu();
-                $detallePermisoMenu->permisoMenu_id = $registrosExistente[0]->permisoMenu_id;
-                $detallePermisoMenu->menu_id = $menusId;
-                $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
-                $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
-                $detallePermisoMenu->colaborador_id = $request->id;
-                $detallePermisoMenu->habilitado = 'S';
-                $detallePermisoMenu->save();
+            if(count($registrosExistente) != 0) {
+                ////echo 'Contiene';
+                // Paso 3: Comparar los usuarios_id existentes con los nuevos usuarios_id
+                $menusIdExistente = $registrosExistente->pluck('menu_id')->toArray();
+                $menusIdEliminar = array_diff($menusIdExistente, $numeros);
+                $menusIdAgregar = array_diff($numeros, $menusIdExistente);
+        
+                //Paso 4: Eliminar los registros que no están en los nuevos usuarios_id
+                DetallePermisoMenu::where('colaborador_id', $request->id)
+                                ->whereIn('menu_id', $menusIdEliminar)
+                                ->delete();
+        
+                // Paso 5: Agregar los nuevos registros para los usuarios_id que no están en los registros existentes
+                foreach ($menusIdAgregar as $menusId) {
+                    $detallePermisoMenu = new DetallePermisoMenu();
+                    $detallePermisoMenu->permisoMenu_id = $registrosExistente[0]->permisoMenu_id;
+                    $detallePermisoMenu->menu_id = $menusId;
+                    $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
+                    $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
+                    $detallePermisoMenu->colaborador_id = $request->id;
+                    $detallePermisoMenu->habilitado = 'S';
+                    $detallePermisoMenu->save();
+                }
+                
+                return response()->json([
+                    'success' => true
+                ], 200);
+
+            } else {
+                
+                $cadenaNumeros = '1,2,3';
+                $numeroArray = explode(',', $nuevosMenusId);
+                $enteroArray = array_map('intval', $numeroArray);
+    
+                $permisoMenu = new PermisoMenu();
+                $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
+                $permisoMenu->habilitado = 'S';
+                $permisoMenu->save();
+                
+                //$myArray = json_decode($request->menu_id);
+                
+                foreach ($enteroArray as $item) {
+                    echo $item;
+                    $detallePermisoMenu = new DetallePermisoMenu();
+                    $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
+                    $detallePermisoMenu->menu_id = $item;
+                    $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
+                    $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
+                    $detallePermisoMenu->colaborador_id = $request->id;
+                    $detallePermisoMenu->habilitado = 'S';
+                    $detallePermisoMenu->save();
+                }
+    
+    
+                return response()->json([
+                    'success' => true
+                ], 200);
             }
-            
-            return response()->json([
-                'success' => true
-            ], 200);
-        } else {
-            
-            $cadenaNumeros = '1,2,3';
-            $numeroArray = explode(',', $cadenaNumeros);
-            $enteroArray = array_map('intval', $numeroArray);
-
-            $permisoMenu = new PermisoMenu();
-            $permisoMenu->tipoPermisoMenu_id = $request->tipoPermisoMenu_id;
-            $permisoMenu->habilitado = 'S';
-            $permisoMenu->save();
-            
-            //$myArray = json_decode($request->menu_id);
-            
-            foreach ($enteroArray as $item) {
-                echo $item;
-                $detallePermisoMenu = new DetallePermisoMenu();
-                $detallePermisoMenu->permisoMenu_id = $permisoMenu->id;
-                $detallePermisoMenu->menu_id = $item;
-                $detallePermisoMenu->departamento_id = $request->departamento_id == 0 ? null : $request->departamento_id;
-                $detallePermisoMenu->cargo_id = $request->cargo_id == 0 ? null : $request->cargo_id;
-                $detallePermisoMenu->colaborador_id = $request->id;
-                $detallePermisoMenu->habilitado = 'S';
-                $detallePermisoMenu->save();
-            }
-
-
-            return response()->json([
-                'success' => true
-            ], 200);
         }
 
     }

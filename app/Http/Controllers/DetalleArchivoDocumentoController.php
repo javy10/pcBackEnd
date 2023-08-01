@@ -157,10 +157,16 @@ class DetalleArchivoDocumentoController extends Controller
         // ]);
     }
 
+
+
+    
+    // ->where(function ($query) use ($request) {
+    //     $query->where('(detalle_permisos.colaborador_id', '=', $request->idC)
+    //           ->orWhere('detalle_permisos.departamento_id', '=', $request->idD);
+    // })
+
     public function obtenerDocumentosID(Request $request)
     {
-        // return $request;
-        // die;
 
         $documentos = DB::table('documentos')
             ->join('detalle_archivo_documentos', 'detalle_archivo_documentos.documento_id', '=', 'documentos.id')
@@ -169,18 +175,17 @@ class DetalleArchivoDocumentoController extends Controller
             ->join('tipo_documentos','documentos.tipoDocumento_id','=','tipo_documentos.id')
             ->distinct()->select('detalle_archivo_documentos.nombreArchivo',  'detalle_archivo_documentos.fechaLimite', 'detalle_archivo_documentos.disponible', 'detalle_archivo_documentos.lectura', 'documentos.tipoDocumento_id', 'tipo_documentos.tipo', 'detalle_permisos.documento_id', 'documentos.titulo')
 
-            // ->where(function ($query) use ($request) {
-            //     $query->where('(detalle_permisos.colaborador_id', '=', $request->idC)
-            //           ->orWhere('detalle_permisos.departamento_id', '=', $request->idD);
-            // })
-
-            ->where('detalle_permisos.colaborador_id', '=', $request->idC)
-            ->orWhere('detalle_permisos.departamento_id', '=', $request->idD)
+            ->where(function ($query) use ($request) {
+                $query->where('detalle_permisos.colaborador_id', '=', $request->idC)
+                      ->orWhereIn('detalle_permisos.departamento_id', $request->idD)
+                      ->orWhereIn('detalle_permisos.cargo_id', $request->idCa);
+            })
 
             ->where('detalle_archivo_documentos.disponible','=','S')
             ->where('detalle_archivo_documentos.lectura','=','S')
             ->where('detalle_archivo_documentos.habilitado','=','S')
             ->get();
+
         return response()->json([
             'dataDB' => $documentos,
             'success' => true

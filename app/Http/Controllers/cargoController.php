@@ -16,7 +16,7 @@ class cargoController extends Controller
      */
     public function index()
     {
-        $cargos = cargo::all();
+        $cargos = cargo::all()->where('habilitado', '=', 'S');
         return $cargos;
     }
 
@@ -31,7 +31,7 @@ class cargoController extends Controller
         $cargo->nombre = $request->nombre;
         $cargo->departamento_id = $request->departamento_id;
         $cargo->habilitado = 'S';
-        $cargo->created_at = $request->fechaRegistro;
+        // $cargo->created_at = $request->fechaRegistro;
         $cargo->save();
 
         return response()->json([
@@ -64,6 +64,7 @@ class cargoController extends Controller
                 ->select('cargos.id', 'cargos.nombre')
                 ->join('departamentos', 'cargos.departamento_id', '=', 'departamentos.id')
                 ->where('cargos.departamento_id', $depart->id)
+                ->where('cargos.habilitado', '=', 'S')
                 ->get();
         return response()->json([
             'dataDB' => $cargo,
@@ -86,9 +87,15 @@ class cargoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+        $cargo = cargo::findOrFail($request->id)->update([
+            'habilitado' => 'N'
+        ]);
+        return response()->json([
+            // 'dataDB' => $colaborador,
+            'success' => true
+        ]);
     }
 
     /**

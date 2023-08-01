@@ -69,7 +69,9 @@ Route::controller(AuthController::class)->group(function() {
         Route::get('eliminarcolaborador/{id}','edit')->name('eliminarcolaborador');
         Route::get('desbloquear/{id}','desbloquear')->name('desbloquear');
         Route::get('colaborador/{id}','show')->name('buscarcolaboradorId');
+        Route::get('filtroUsuarios/{nombre}','filtroUsuarios')->name('filtroUsuarios');
         Route::get('obtenerColaboradorID/{id}','obtenerColaboradorID')->name('obtenerColaboradorID');
+        Route::get('obtenerPorIDColaborador/{id}','obtenerPorIDColaborador')->name('obtenerPorIDColaborador');
         Route::post('editarcolaborador','update')->name('editarColaborador');
         Route::get('login/{dui}','buscar')->name('buscarColaboradorDui');
         Route::get('editarintentos/{dui}','editarIntentos')->name('editarintentos');
@@ -92,6 +94,7 @@ Route::controller(agenciaController::class)->group(function() {
 Route::controller(departamentoController::class)->group(function() {
     Route::get('departamentos','index')->name('departamentos')->middleware('auth');
     Route::get('departamento/{id}','show')->name('buscardepartamentoId')->middleware('auth');
+    Route::post('departamento','create')->name('departamento');
 });
 
 Route::controller(cargoController::class)->group(function() {
@@ -99,6 +102,7 @@ Route::controller(cargoController::class)->group(function() {
     Route::get('cargos/{id}','show')->name('cargosId')->middleware('auth');
     Route::get('cargo/{id}','buscar')->name('cargoId')->middleware('auth');
     Route::post('guardarCargo','create')->name('guardarCargo')->middleware('auth');
+    Route::get('eliminarCargo/{id}','edit')->name('eliminarCargo');
 });
 
 Route::controller(TipoDocumentoController::class)->group(function() {
@@ -180,6 +184,10 @@ Route::controller(GrupoController::class)->group(function() {
 Route::controller(EvaluacionController::class)->group(function() {
     Route::post('crearEvaluacion','create')->name('create');
     Route::get('obtenerEvaluaciones','index')->name('obtenerEvaluaciones');
+    Route::get('obtenerEvaluacionesAbiertas','obtenerEvaluacionesAbiertas')->name('obtenerEvaluacionesAbiertas');
+    Route::get('obtenerEvaluacionesAbiertasId/{id}','obtenerEvaluacionesAbiertasId')->name('obtenerEvaluacionesAbiertasId');
+    Route::post('obtenerEvaluacionesAbiertasRespuestaId','obtenerEvaluacionesAbiertasRespuestaId')->name('obtenerEvaluacionesAbiertasRespuestaId');
+    Route::get('indexEvaluaciones','indexEvaluaciones')->name('indexEvaluaciones');
     Route::get('obtenerEvaluacionesDeshabilitadas','obtenerEvaluacionesDeshabilitadas')->name('obtenerEvaluacionesDeshabilitadas');
     Route::get('obtenerEvaluacionID/{id}','show')->name('obtenerEvaluacionID');
     Route::post('editarCantidadPreguntas','edit')->name('editarCantidadPreguntas');
@@ -195,6 +203,7 @@ Route::controller(DetalleGrupoEvaluacionController::class)->group(function() {
     Route::post('editarDetalleGrupo','update')->name('editarDetalleGrupo');
     Route::get('habilitarEvaluacion/{id}','habilitarEvaluacion')->name('habilitarEvaluacion');
     Route::get('obtenerDetalleGrupoEvaluacion/{id}','show')->name('obtenerDetalleGrupoEvaluacion');
+    Route::get('evaluacionAbierta/{id}','evaluacionAbierta')->name('evaluacionAbierta');
     Route::get('intentosColaboradores/{id}','intentosColaboradores')->name('intentosColaboradores');
     Route::get('habilitarIntentosEvaluacion/{id}','habilitarIntentosEvaluacion')->name('habilitarIntentosEvaluacion');
     Route::post('obtenerResultadosEvaluacion', 'obtenerResultadosEvaluacion')->name('obtenerResultadosEvaluacion');
@@ -207,7 +216,10 @@ Route::controller(TipoPreguntaController::class)->group(function() {
 
 Route::controller(PreguntaController::class)->group(function() {
     Route::post('crearPreguntas','create')->name('crearPreguntas');
-    
+    Route::post('crearPreguntasAbiertas','crearPreguntasAbiertas')->name('crearPreguntasAbiertas');
+    Route::get('obtenerPreguntasId/{id}','show')->name('obtenerPreguntasId');
+    Route::get('deshabilitarPregunta/{id}','deshabilitarPregunta')->name('deshabilitarPregunta');
+    Route::post('editarPreguntasAbiertas','edit')->name('editarPreguntasAbiertas');
 });
 
 Route::controller(RespuestaController::class)->group(function() {
@@ -229,5 +241,5 @@ Route::controller(DetallePreguntaRespuestaController::class)->group(function() {
 
 Route::controller(ResultadoController::class)->group(function() {
     Route::post('guardarResultadoPreguntas','create')->name('guardarResultadoPreguntas');
-    
+    Route::post('ResultadosPreguntasAbiertas','ResultadosPreguntasAbiertas')->name('ResultadosPreguntasAbiertas');
 });

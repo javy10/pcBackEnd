@@ -13,20 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('detalle_permisos', function (Blueprint $table) {
+        Schema::create('config_departamentocargos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('colaborador_id');
             $table->unsignedBigInteger('departamento_id');
             $table->unsignedBigInteger('cargo_id');
-            $table->unsignedBigInteger('documento_id');
-            $table->unsignedBigInteger('permiso_id');
             $table->char('habilitado');
             $table->timestamps();
+
             $table->foreign('colaborador_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('departamento_id')->references('id')->on('departamentos')->onDelete('cascade');
             $table->foreign('cargo_id')->references('id')->on('cargos')->onDelete('cascade');
-            $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
-            $table->foreign('permiso_id')->references('id')->on('permisos')->onDelete('cascade');
         });
     }
 
@@ -37,7 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        //Schema::dropIfExists('detalle_permisos');
-        Schema::drop('detalle_permisos');
+        Schema::dropIfExists('config_departamentocargos');
     }
 };

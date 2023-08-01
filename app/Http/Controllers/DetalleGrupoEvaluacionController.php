@@ -97,6 +97,23 @@ class DetalleGrupoEvaluacionController extends Controller
         ], 201);
     }
 
+    public function evaluacionAbierta($id)
+    {
+        $resultados = DetalleGrupoEvaluaciones::join('evaluaciones', 'detalle_grupo_evaluaciones.evaluacion_id', '=', 'evaluaciones.id')
+                    ->join('grupo_evaluaciones', 'detalle_grupo_evaluaciones.grupo_id', '=', 'grupo_evaluaciones.id')
+                    ->where('evaluaciones.habilitado', '=', 'S')
+                    ->where('evaluaciones.cantidadPreguntas', '>', 0)
+                    ->where('grupo_evaluaciones.habilitado', '=', 'S')                    
+                    ->where('detalle_grupo_evaluaciones.colaborador_id', '=', $id)
+                    ->select('detalle_grupo_evaluaciones.colaborador_id', 'grupo_evaluaciones.apertura', 'grupo_evaluaciones.cierre', 'evaluaciones.cantidadPreguntas')
+                    ->get();
+
+        return response()->json([
+            'dataDB' => $resultados,
+            'success' => true
+        ], 201);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
